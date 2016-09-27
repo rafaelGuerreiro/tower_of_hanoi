@@ -21,12 +21,16 @@
     if (isEmpty(selector))
       return EMPTY_NODES;
 
-    if (isStringPresent(parent))
-      return toNodesList(querySelectorAll(parent).map(function() {
-        return querySelectorAll(this, selector);
-      }));
+    var elements = [];
 
-    return toNodesList(document.querySelectorAll(selector));
+    if (isStringPresent(parent))
+      elements = querySelectorAll(parent).map(function() {
+        return querySelectorAll(this, selector);
+      });
+    else
+      elements = document.querySelectorAll(selector);
+
+    return toNodesList(elements);
   }
 
   function toNodesList(nodes) {

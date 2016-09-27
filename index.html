@@ -2,17 +2,52 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
     <title>Tower of Hanoi</title>
 
     <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="css/game_style.css" />
   </head>
   <body>
-    <header>
-      <small>Developed by <strong>Rafael Rubem Rossi Souza Guerreiro</strong>.</small>
+    <header class="centred-container">
+      <div class="developed-by">
+        Developed by <strong class="developers-name">Rafael Rubem Rossi Souza Guerreiro.</strong>
+      </div>
     </header>
 
-    <main>
+    <main class="centred-container game-main-container">
+      some text
+
+      <div class="game-container">
+        <div class="column-container">
+          <div class="column">
+            <div class="tile tile-1 active"></div>
+            <div class="tile tile-2"></div>
+            <div class="tile tile-3"></div>
+            <div class="tile tile-4"></div>
+          </div>
+
+          <div class="tile-base"></div>
+        </div>
+
+        <div class="column-container">
+          <div class="column">
+            <div class="tile tile-5 active"></div>
+            <div class="tile tile-6"></div>
+            <div class="tile tile-7"></div>
+            <div class="tile tile-8"></div>
+            <div class="tile tile-9"></div>
+          </div>
+          <div class="tile-base"></div>
+        </div>
+
+        <div class="column-container">
+          <div class="column">
+          </div>
+          <div class="tile-base"></div>
+        </div>
+      </div>
     </main>
 
     <script type="text/javascript" src="js/game_framework.js" />

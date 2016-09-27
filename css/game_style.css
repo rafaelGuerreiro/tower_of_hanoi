@@ -1,0 +1,105 @@
+body {
+  background-color: #ddd;
+}
+
+.centred-container {
+  width: 80%;
+  margin: 0 auto;
+  display: block;
+}
+
+.developed-by {
+  text-align: center;
+  font-size: 0.9em;
+}
+
+.game-main-container {
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 4px;
+  box-shadow: 0px 1px 2px #222;
+}
+
+.game-container {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+
+  height: 350px;
+}
+
+.game-container>.column-container {
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: flex-end;
+
+  position: relative;
+  width: 33%;
+  height: 100%;
+
+  cursor: pointer;
+}
+
+.column-container>.column {
+  display: flex;
+  flex-flow: column wrap;
+
+  width: 100%;
+}
+
+.column>.tile {
+  margin: 0 auto;
+  border-radius: 10px;
+  height: 30px;
+  display: block;
+  box-shadow: 0px 1px 2px #222;
+}
+
+.column>.tile.active {
+  position: absolute;
+  top: 0px;
+  align-self: center;
+}
+
+.column-container>.tile-base {
+  display: block;
+  width: 100%;
+  height: 15px;
+  background-color: SaddleBrown;
+
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+
+  box-shadow: 0px 0px 1px #222;
+}
+
+.tile.tile-1 { width: 15%; background-color: Crimson; }
+.tile.tile-2 { width: 25%; background-color: DarkGreen; }
+.tile.tile-3 { width: 35%; background-color: DarkBlue; }
+.tile.tile-4 { width: 45%; background-color: DarkGoldenRod; }
+.tile.tile-5 { width: 55%; background-color: Indigo; }
+.tile.tile-6 { width: 65%; background-color: DarkMagenta; }
+.tile.tile-7 { width: 75%; background-color: LimeGreen; }
+.tile.tile-8 { width: 85%; background-color: OliveDrab; }
+.tile.tile-9 { width: 95%; background-color: OrangeRed; }
+
+@media (max-width: 375px) {
+  .developed-by>.developers-name {
+    display: block;
+  }
+}
+
+@media (max-width: 667px) {
+  body {
+    background-color: #fff;
+  }
+
+  .centred-container {
+    width: 100%;
+  }
+
+  .game-main-container {
+    border-radius: 0px;
+    box-shadow: none;
+  }
+}

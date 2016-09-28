@@ -6,6 +6,7 @@
   Array.prototype.map = _map;
   Array.prototype.flatten = _flatten;
   Array.prototype.reduce = _reduce;
+  Array.prototype.remove = _remove;
 
   var $ = _querySelectorAll;
 
@@ -91,6 +92,8 @@
       var parent = this;
 
       this.node.addEventListener(event, function(e) {
+        console.log(e);
+
         var target = new GameNode(e.target);
         if (!target.matches(selector))
           return;
@@ -180,6 +183,125 @@
     return value;
   }
 
+  function _remove(/* value1, value2 */) {
+    if (arguments.length === 0)
+      return this;
+
+    for (var ix = 0; ix < arguments.length; ix++) {
+      var value = arguments[ix];
+
+      for (var index = 0; index < this.length; index++)
+        if (value === this[index])
+          this.splice(index, 1);
+    }
+
+    return this;
+  }
+
+  function _filter(selector) {
+    if (!_isStringPresent(selector))
+      return this;
+
+    var filter = [];
+    this.each(function() {
+      if (this.matches(selector))
+        filter.add(this);
+    });
+
+    return new GameNodes(filter);
+  }
+
+  function _addClass(classes) {
+    if (!_isStringPresent(classes))
+      return this;
+
+    if (this instanceof GameNode) {
+      var toAdd = _processClassNames(classes);
+
+      this.styleNames.each(function() {
+        toAdd.remove(this);
+      });
+      if (toAdd.length > 0)
+        this.styleNames.push(toAdd);
+
+      return _updateClassNames.call(this);
+    }
+
+    return this.each(function() {
+      this.addClass(classes);
+    });
+  }
+
+  function _removeClass(classes) {
+    if (!_isStringPresent(classes))
+      return this;
+
+    if (this instanceof GameNode) {
+      var toRemove = _processClassNames(classes);
+      var obj = this;
+
+      toRemove.each(function() {
+        obj.styleNames.remove(this);
+      });
+
+      return _updateClassNames.call(this);
+    }
+
+    return this.each(function() {
+      this.removeClass(classes);
+    });
+  }
+
+  function _toggleClass(classes) {
+    if (!_isStringPresent(classes))
+      return this;
+
+    if (this instanceof GameNode) {
+      var toToggle = _processClassNames(classes);
+      var obj = this;
+
+      toToggle.each(function() {
+        if (obj.hasClass(this))
+          obj.removeClass(this);
+        else
+          obj.addClass(this);
+      });
+    }
+
+    return this.each(function() {
+      this.toggleClass(classes);
+    });
+  }
+
+  function _hasClass(classes) {
+    if (!_isStringPresent(classes))
+      return false;
+
+    if (this instanceof GameNode) {
+      var toVerify = _processClassNames(classes);
+      var obj = this;
+
+      return toVerify.reduce(function(hasClass, className) {
+        return hasClass && obj.styleNames.indexOf(className) > -1;
+      }, true);
+    }
+
+    return this.map(function() {
+        return this.toggleClass(classes);
+      }).reduce(function(hasClass, eachVal) {
+        return hasClass && eachVal;
+      });
+  }
+
+  function _processClassNames(classes) {
+    return classes.toLowerCase().split(/\s+/g);
+  }
+
+  function _updateClassNames() {
+    this.node.className = this.styleNames.join(' ');
+    return this;
+  }
+
   function _toNodesList(nodes) {
     if (!nodes)
       nodes = [];
@@ -205,6 +327,7 @@
     this.find = _find;
     this.match = _match;
     this.flatten = _flatten;
+    this.filter = _filter;
 
     for (var index = 0; index < elements.length; index++) {
       var el = elements[index];
@@ -219,5 +342,14 @@
     this.node = node;
     this.matches = _matches;
     this.find = _find;
+
+    this.styleNames = [];
+
+    this.addClass = _addClass;
+    this.removeClass = _removeClass;
+    this.toggleClass = _toggleClass;
+    this.hasClass = _hasClass;
+
+    this.addClass(node.className);
   }
 })(document, window);

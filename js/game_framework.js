@@ -2,46 +2,41 @@
 ;(function(document, window, undefined) {
   'use strict';
 
-  var EMPTY_NODES = toNodesList();
+  Array.prototype.each = _each;
+  Array.prototype.map = _map;
+  Array.prototype.flatten = _flatten;
+  Array.prototype.reduce = _reduce;
 
-  Array.prototype.each = each;
-  Array.prototype.map = map;
+  var $ = _querySelectorAll;
 
-  var $ = querySelectorAll;
-
-  $.isEmpty = isEmpty;
-  $.isPresent = isPresent;
-  $.isStringPresent = isStringPresent;
-  $.isFunction = isFunction;
+  $.isEmpty = _isEmpty;
+  $.isPresent = _isPresent;
+  $.isStringPresent = _isStringPresent;
+  $.isFunction = _isFunction;
 
   window.$ = $;
 
+  var $body = new GameNode(document.body);
+
   // Main functions
-  function querySelectorAll(selector, parent) {
-    if (isEmpty(selector))
-      return EMPTY_NODES;
+  function _querySelectorAll(selector, parent) {
+    if (_isEmpty(selector))
+      return new GameNodes();
 
-    var elements = [];
+    if (_isEmpty(parent) && (selector instanceof GameNodes || selector instanceof GameNode))
+      return new GameNodes(selector);
 
-    if (isStringPresent(parent))
-      elements = querySelectorAll(parent).map(function() {
-        return querySelectorAll(this, selector);
-      });
-    else
-      elements = document.querySelectorAll(selector);
+    if (parent instanceof GameNodes || parent instanceof GameNode)
+      return parent.find(selector);
 
-    return toNodesList(elements);
-  }
+    if (_isStringPresent(parent))
+      return $body.find(parent).find(selector);
 
-  function toNodesList(nodes) {
-    if (!nodes)
-      nodes = [];
-
-    return Array.isArray(nodes) ? nodes : [nodes];
+    return $body.find(selector);
   }
 
   // Helper functions
-  function isEmpty(value) {
+  function _isEmpty(value) {
     if (!value)
       return true;
 
@@ -51,26 +46,25 @@
     return !value;
   }
 
-  function isPresent(value) {
-    return !isEmpty(value);
+  function _isPresent(value) {
+    return !_isEmpty(value);
   }
 
-  function isStringPresent(value) {
-    return typeof value === 'string' && isPresent(value);
+  function _isStringPresent(value) {
+    return typeof value === 'string' && _isPresent(value);
   }
 
-  function isFunction(fn) {
-    return isPresent(fn) && typeof fn === 'function';
+  function _isFunction(fn) {
+    return _isPresent(fn) && typeof fn === 'function';
   }
 
   // Objects improvement
-  function each(callback) {
-    if (!isFunction(callback))
+  function _each(callback) {
+    if (!_isFunction(callback))
       return this;
 
     for (var index = 0; index < this.length; index++) {
       var response = callback.call(this[index], index, this);
-
       if (response === false)
         break;
     }
@@ -78,14 +72,152 @@
     return this;
   }
 
-  function map(callback) {
-    if (!isFunction(callback))
-      return [];
+  function _map(callback) {
+    if (!_isFunction(callback))
+      callback = function() { return this; };
 
     var map = [];
     for (var index = 0; index < this.length; index++)
       map.push(callback.call(this[index], index, this));
 
     return map;
+  }
+
+  function _live(event, selector, callback) {
+    if (!_isFunction(callback))
+      return this;
+
+    return this.each(function() {
+      var parent = this;
+
+      this.node.addEventListener(event, function(e) {
+        var target = new GameNode(e.target);
+        if (!target.matches(selector))
+          return;
+
+        var response = callback.call(target, e, parent);
+        if (response === false) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      });
+    });
+  }
+
+  function _find(selector) {
+    if (_isEmpty(selector))
+      return new GameNodes();
+
+    if (this instanceof GameNode)
+      return new GameNodes(this.node.querySelectorAll(selector));
+
+    return new GameNodes(this.map(function() {
+      return this.find(selector);
+    }));
+  }
+
+  function _get(index) {
+    if (typeof index !== 'number')
+      return this;
+
+    index = index % this.length;
+
+    if (index < 0)
+      index = this.length + index;
+
+    return new GameNodes(this[index]);
+  }
+
+  function _match(selector) {
+    if (!_isStringPresent(selector))
+      return false;
+
+    var match = true;
+    this.each(function() {
+      return match && this.matches(selector);
+    });
+
+    return match;
+  }
+
+  function _matches(selector) {
+    if (!_isStringPresent(selector))
+      return false;
+
+    var fn = this.node.matches ||
+      this.node.webkitMatchesSelector ||
+      this.node.mozMatchesSelector ||
+      this.node.msMatchesSelector ||
+      this.node.oMatchesSelector;
+
+    return fn.call(this.node, selector);
+  }
+
+  function _flatten() {
+    if (this instanceof GameNodes)
+      return this.map().flatten();
+
+    return this.reduce(function (flat, toFlatten) {
+      var val = toFlatten;
+      if (_isFunction(toFlatten.flatten))
+        val = toFlatten.flatten();
+
+      return flat.concat(val);
+    }, []);
+  }
+
+  function _reduce(callback, value) {
+    if (value === undefined)
+      return undefined;
+
+    if (!_isFunction(callback))
+      return value;
+
+    for (var index = 0; index < this.length; index++) {
+      value = callback(value, this[index], index, this);
+    }
+
+    return value;
+  }
+
+  function _toNodesList(nodes) {
+    if (!nodes)
+      nodes = [];
+
+    if (nodes instanceof NodeList)
+      return nodes;
+
+    if (nodes instanceof Array || nodes instanceof GameNodes)
+      return nodes.flatten();
+
+    return [nodes].flatten();
+  }
+
+  // Classes
+  function GameNodes(nodes) {
+    var elements = _toNodesList(nodes);
+
+    this.length = elements.length;
+    this.each = _each;
+    this.map = _map;
+    this.live = _live;
+    this.get = _get;
+    this.find = _find;
+    this.match = _match;
+    this.flatten = _flatten;
+
+    for (var index = 0; index < elements.length; index++) {
+      var el = elements[index];
+      if (el instanceof GameNode)
+        el = el.node;
+
+      this[index] = new GameNode(el);
+    }
+  }
+
+  function GameNode(node) {
+    this.node = node;
+    this.matches = _matches;
+    this.find = _find;
   }
 })(document, window);

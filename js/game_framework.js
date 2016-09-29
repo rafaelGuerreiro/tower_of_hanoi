@@ -17,7 +17,7 @@
 
   window.$ = $;
 
-  window.$body = new GameNode(document.body);
+  var $body = new GameNode(document.body);
 
   // Main functions
   function _querySelectorAll(selector, parent) {

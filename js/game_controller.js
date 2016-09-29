@@ -18,8 +18,6 @@
         column: columnIndex
       });
     });
-
-    console.log(game);
   })();
 
   $('.game-container').live('click', '.column-container', function() {

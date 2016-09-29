@@ -113,6 +113,23 @@
     }
   }
 
+  function _closest(selector) {
+    if (this instanceof GameNode) {
+      if (!this.matches(selector)) {
+        if (this.matches('body'))
+          return new GameNodes();
+
+        return this.parent().closest(selector);
+      }
+
+      return new GameNodes(this);
+    }
+
+    return new GameNodes(this.map(function() {
+      return this.closest(selector);
+    }));
+  }
+
   function _find(selector) {
     if (_isEmpty(selector))
       return new GameNodes();
@@ -314,6 +331,86 @@
     return new GameNode(this.node.parentNode);
   }
 
+  function _data(key, value) {
+    if (this instanceof GameNode) {
+      if (!_isStringPresent(key))
+        return this._data;
+
+      if (value === undefined)
+        return this._data[key];
+
+      return _setData.call(this, key, value);
+    }
+
+    return this.map(function() {
+      return this.data(key, value);
+    });
+  }
+
+  function _removeData(key) {
+    if (this instanceof GameNode) {
+      var data = _getData.call(this, key);
+
+      if (data !== undefined)
+        this._data[key] = undefined;
+
+      return data;
+    }
+
+    return this.map(function() {
+      return this.removeData(key);
+    });
+  }
+
+  function _setData(key, value) {
+    if (this instanceof GameNode) {
+      if (!_isStringPresent(key))
+        return undefined;
+
+      if (value === undefined)
+        return _removeData.call(this, key);
+
+      this._data[key] = _convert(value);
+      return value;
+    }
+
+    return this.map(function() {
+      return this.setData(key, value);
+    });
+  }
+
+  function _convert(value) {
+    if (!(value instanceof String))
+      return value;
+
+    if (_isConvertibleToArray(value) || _isConvertibleToObject(value))
+      return JSON.parse(value);
+
+    if (_isConvertibleToBoolean(value))
+      return (value === 'true');
+
+    if (_isConvertibleToNumber(value))
+      return Number(value);
+
+    return value;
+  }
+
+  function _isConvertibleToArray(value) {
+    return value.match(/^\[.*?\]$/g);
+  }
+
+  function _isConvertibleToObject(value) {
+    return value.match(/^\{.*?\}$/g);
+  }
+
+  function _isConvertibleToBoolean(value) {
+    return value.match(/^(true|false)$/g);
+  }
+
+  function _isConvertibleToNumber(value) {
+    return value.match(/^(+|-)?\d+\.?\d*$/g);
+  }
+
   function _toNodesList(nodes) {
     if (!nodes)
       nodes = [];
@@ -325,6 +422,42 @@
       return nodes.flatten();
 
     return [nodes].flatten();
+  }
+
+  function _getDataAttributes(node) {
+    var list = node.attributes;
+
+    var data = {};
+    for (var index = 0; index < list.length; index++) {
+      var attr = list[index];
+      if (attr.name.match(/^data\-[a-z0-9\-]*$/gi))
+        data[_toKeyName(attr.name)] = _convert(attr.value);
+    }
+
+    return data;
+  }
+
+  function _toKeyName(name) {
+    return _toCamelCase(name.substring(5));
+  }
+
+  function _toCamelCase(str) {
+    var split = str.toLowerCase().split('-');
+
+    if (split.length === 1)
+      return split[0];
+
+    for (var index = 1; index < split.length; index++)
+      split[index] = _capitalize(split[index]);
+
+    return split.join('');
+  }
+
+  function _capitalize(str) {
+    if (str.length <= 1)
+      return str.toUpperCase();
+
+    return str.substring(0, 1).toUpperCase() + str.substring(1);
   }
 
   // Classes
@@ -340,11 +473,16 @@
     this.match = _match;
     this.flatten = _flatten;
     this.filter = _filter;
+    this.closest = _closest;
 
     this.addClass = _addClass;
     this.removeClass = _removeClass;
     this.toggleClass = _toggleClass;
     this.hasClass = _hasClass;
+
+    this.data = _data;
+    this.removeData = _removeData;
+    this.setData = _setData;
 
     for (var index = 0; index < elements.length; index++) {
       var el = elements[index];
@@ -357,8 +495,11 @@
 
   function GameNode(node) {
     this.node = node;
+    this._data = _getDataAttributes(node);
+
     this.matches = _matches;
     this.find = _find;
+    this.closest = _closest;
 
     this.styleNames = _processClassNames(node.className);
 
@@ -367,5 +508,9 @@
     this.toggleClass = _toggleClass;
     this.hasClass = _hasClass;
     this.parent = _parent;
+
+    this.data = _data;
+    this.removeData = _removeData;
+    this.setData = _setData;
   }
 })(document, window);

@@ -2,21 +2,24 @@
   'use strict';
 
   var game = [[], [], []];
-      //
-      // {
-      //   nodes: {
-      //     tile:
-      //     column:
-      //   },
-      //   column:
-      //   size:
-      // }
 
   (function initialize() {
     $('.tile').each(function() {
-      console.log(this.parent().data('column'));
-      console.log(this.data('tile'));
+      var column = this.parent();
+      var columnIndex = column.data('column');
+      var tileIndex = this.data('tile');
+
+      game[columnIndex].splice(tileIndex, 0, {
+        nodes: {
+          tile: this,
+          column: column
+        },
+        tile: tileIndex,
+        column: columnIndex
+      });
     });
+
+    console.log(game);
   })();
 
   $('.game-container').live('click', '.column-container', function() {

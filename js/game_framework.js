@@ -349,8 +349,7 @@
 
   function _removeData(key) {
     if (this instanceof GameNode) {
-      var data = _getData.call(this, key);
-
+      var data = this._data[key];
       if (data !== undefined)
         this._data[key] = undefined;
 
@@ -370,7 +369,10 @@
       if (value === undefined)
         return _removeData.call(this, key);
 
-      this._data[key] = _convert(value);
+      _setDataAttribute(this.node, key, value);
+
+      value = _convert(value);
+      this._data[key] = value;
       return value;
     }
 
@@ -380,7 +382,7 @@
   }
 
   function _convert(value) {
-    if (!(value instanceof String))
+    if (typeof value !== 'string')
       return value;
 
     if (_isConvertibleToArray(value) || _isConvertibleToObject(value))
@@ -408,7 +410,7 @@
   }
 
   function _isConvertibleToNumber(value) {
-    return value.match(/^(+|-)?\d+\.?\d*$/g);
+    return value.match(/^[\+\-]?\d+\.?\d*$/g);
   }
 
   function _toNodesList(nodes) {
@@ -437,8 +439,26 @@
     return data;
   }
 
+  function _setDataAttribute(node, key, value) {
+    key = 'data-' + _toSnakeCase(key);
+
+    if (typeof value === 'object' || Array.isArray(value))
+      value = JSON.stringify(value);
+
+    node.setAttribute(key, value);
+  }
+
   function _toKeyName(name) {
-    return _toCamelCase(name.substring(5));
+    return _toCamelCase(name.substring('data-'.length));
+  }
+
+  function _toSnakeCase(str) {
+    str = str.replace(/([A-Z]+)/g, '-$1');
+
+    if (str.match(/^[\-].*$/g))
+      str = str.substring(1);
+
+    return str.toLowerCase();
   }
 
   function _toCamelCase(str) {

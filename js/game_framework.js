@@ -17,7 +17,7 @@
 
   window.$ = $;
 
-  var $body = new GameNode(document.body);
+  window.$body = new GameNode(document.body);
 
   // Main functions
   function _querySelectorAll(selector, parent) {
@@ -92,19 +92,25 @@
       var parent = this;
 
       this.node.addEventListener(event, function(e) {
-        console.log(e);
-
         var target = new GameNode(e.target);
-        if (!target.matches(selector))
-          return;
-
-        var response = callback.call(target, e, parent);
-        if (response === false) {
-          e.preventDefault();
-          e.stopPropagation();
-        }
+        _bubbleUp(target, selector, callback, e);
       });
     });
+  }
+
+  function _bubbleUp(target, selector, callback, e) {
+    if (!target.matches(selector)) {
+      if (target.matches('body'))
+        return;
+
+      return _bubbleUp(target.parent(), selector, callback, e);
+    }
+
+    var response = callback.call(target, e, parent);
+    if (response === false) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
   }
 
   function _find(selector) {
@@ -147,11 +153,11 @@
     if (!_isStringPresent(selector))
       return false;
 
-    var fn = this.node.matches ||
+    var fn = (this.node.matches ||
       this.node.webkitMatchesSelector ||
       this.node.mozMatchesSelector ||
       this.node.msMatchesSelector ||
-      this.node.oMatchesSelector;
+      this.node.oMatchesSelector);
 
     return fn.call(this.node, selector);
   }
@@ -266,6 +272,8 @@
         else
           obj.addClass(this);
       });
+
+      return this;
     }
 
     return this.each(function() {
@@ -302,6 +310,10 @@
     return this;
   }
 
+  function _parent() {
+    return new GameNode(this.node.parentNode);
+  }
+
   function _toNodesList(nodes) {
     if (!nodes)
       nodes = [];
@@ -329,6 +341,11 @@
     this.flatten = _flatten;
     this.filter = _filter;
 
+    this.addClass = _addClass;
+    this.removeClass = _removeClass;
+    this.toggleClass = _toggleClass;
+    this.hasClass = _hasClass;
+
     for (var index = 0; index < elements.length; index++) {
       var el = elements[index];
       if (el instanceof GameNode)
@@ -343,13 +360,12 @@
     this.matches = _matches;
     this.find = _find;
 
-    this.styleNames = [];
+    this.styleNames = _processClassNames(node.className);
 
     this.addClass = _addClass;
     this.removeClass = _removeClass;
     this.toggleClass = _toggleClass;
     this.hasClass = _hasClass;
-
-    this.addClass(node.className);
+    this.parent = _parent;
   }
 })(document, window);

@@ -24,6 +24,9 @@
     if (_isEmpty(selector))
       return new GameNodes();
 
+    if (selector instanceof Node || selector instanceof NodeList)
+      return new GameNodes(selector);
+
     if (_isEmpty(parent) && (selector instanceof GameNodes || selector instanceof GameNode))
       return new GameNodes(selector);
 
@@ -88,25 +91,65 @@
     if (!_isFunction(callback))
       return this;
 
-    return this.each(function() {
-      var parent = this;
+    var events = event.split(/\s+/g);
 
-      this.node.addEventListener(event, function(e) {
-        var target = new GameNode(e.target);
-        _bubbleUp(target, selector, callback, e);
-      });
+    if (this instanceof GameNode)
+      return _invoke.call(this, events, selector, callback, _invokeLive);
+
+    return this.each(function() {
+      _invoke.call(this, events, selector, callback, _invokeLive);
     });
   }
 
-  function _bubbleUp(target, selector, callback, e) {
+  function _invoke(events, selector, callback, invocationType) {
+    var that = this;
+    var node = that.node;
+
+    events.each(function() {
+      node.addEventListener(this, function(event) {
+        invocationType.call(that, event, selector, callback);
+      });
+    });
+
+    return this;
+  }
+
+  function _invokeLive(event, selector, callback) {
+    var target = new GameNode(event.target);
+    _bubbleUp(target, selector, callback, event, this);
+  }
+
+  function _on(events, selector, callback) {
+    if (!_isFunction(callback))
+      return this;
+
+    var events = event.split(/\s+/g);
+
+    if (this instanceof GameNode)
+      return _invoke.call(this, events, selector, callback, _invokeOn);
+
+    return this.each(function() {
+      _invoke.call(this, events, selector, callback, _invokeOn);
+    });
+  }
+
+  function _invokeOn(event, selector, callback) {
+    _invokeEventCallback(this, callback, event, this);
+  }
+
+  function _bubbleUp(target, selector, callback, e, eventAttachedOn) {
     if (!target.matches(selector)) {
       if (target.matches('body'))
         return;
 
-      return _bubbleUp(target.parent(), selector, callback, e);
+      return _bubbleUp(target.parent(), selector, callback, e, eventAttachedOn);
     }
 
-    var response = callback.call(target, e, parent);
+    _invokeEventCallback(target, callback, e, eventAttachedOn);
+  }
+
+  function _invokeEventCallback(target, callback, e, eventAttachedOn) {
+    var response = callback.call(target, e, eventAttachedOn);
     if (response === false) {
       e.preventDefault();
       e.stopPropagation();
@@ -319,6 +362,9 @@
   }
 
   function _processClassNames(classes) {
+    if (classes === undefined)
+      return undefined;
+
     return classes.toLowerCase().split(/\s+/g);
   }
 
@@ -428,6 +474,9 @@
 
   function _getDataAttributes(node) {
     var list = node.attributes;
+
+    if (list === undefined)
+      return {};
 
     var data = {};
     for (var index = 0; index < list.length; index++) {
@@ -563,6 +612,7 @@
     this.each = _each;
     this.map = _map;
     this.live = _live;
+    this.on = _on;
     this.get = _get;
     this.find = _find;
     this.children = _children;
@@ -595,6 +645,7 @@
 
     this.matches = _matches;
     this.find = _find;
+    this.on = _on;
     this.children = _children;
     this.closest = _closest;
 

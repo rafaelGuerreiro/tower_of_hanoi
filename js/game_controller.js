@@ -4,6 +4,19 @@
   var game = [[], [], []];
   var activeTile = null;
 
+
+  $(document).on('keypress keydown keyup', function(event) {
+    console.log(event);
+    console.log(String.fromCharCode(event.which));
+
+    return false;
+  });
+
+  $('.game-container').live('click', '.column-container', function() {
+    var column = this.children('.column').get(0);
+    _selectTile(column, column.data('column'));
+  });
+
   (function initialize() {
     $('.tile').each(function() {
       var column = this.parent();
@@ -20,11 +33,6 @@
       });
     });
   })();
-
-  $('.game-container').live('click', '.column-container', function() {
-    var column = this.children('.column').get(0);
-    _selectTile(column, column.data('column'));
-  });
 
   // functions
   function _selectTile(column, index) {
@@ -50,6 +58,9 @@
   }
 
   function _moveTileTo(column, index) {
+    if (!_isAbleToMove(index))
+      return;
+
     game[activeTile.column].remove(activeTile);
     game[index].splice(0, 0, activeTile);
 
@@ -59,5 +70,14 @@
     column.prepend(activeTile.nodes.tile);
 
     _unselectTile();
+  }
+
+  function _isAbleToMove(index) {
+    var column = game[index];
+
+    if (column.length === 0)
+      return true;
+
+    return activeTile.tile < column[0].tile;
   }
 })($, document, window);

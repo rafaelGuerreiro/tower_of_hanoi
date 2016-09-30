@@ -131,8 +131,8 @@
   }
 
   function _find(selector) {
-    if (_isEmpty(selector))
-      return new GameNodes();
+    if (!_isStringPresent(selector))
+      selector = '*';
 
     if (this instanceof GameNode)
       return new GameNodes(this.node.querySelectorAll(selector));
@@ -143,15 +143,15 @@
   }
 
   function _get(index) {
-    if (typeof index !== 'number')
-      return this;
+    if (typeof index !== 'number' || this.length === 0)
+      return undefined;
 
     index = index % this.length;
 
     if (index < 0)
       index = this.length + index;
 
-    return new GameNodes(this[index]);
+    return this[index];
   }
 
   function _match(selector) {
@@ -480,6 +480,81 @@
     return str.substring(0, 1).toUpperCase() + str.substring(1);
   }
 
+  function _append(/* node1, node2 */) {
+    var length = arguments.length;
+    if (length === 0)
+      return this;
+
+    var parent = this;
+    for (var index = 0; index < length; index++) {
+      var node = arguments[index];
+
+      if (node instanceof GameNode)
+        _appendSingle(parent, node);
+      else if (node instanceof GameNodes)
+        node.each(function() {
+          _appendSingle(parent, this);
+        });
+    }
+
+    return this;
+  }
+
+  function _appendSingle(parent, child) {
+    parent.node.appendChild(child.node);
+  }
+
+  function _prepend(/* node1, node2 */) {
+    var length = arguments.length;
+    if (length === 0)
+      return this;
+
+    var parent = this;
+    for (var index = length - 1; index >= 0; index--) {
+      var node = arguments[index];
+
+      if (node instanceof GameNode)
+        _prependSingle(parent, node);
+      else if (node instanceof GameNodes)
+        node.each(function() {
+          _prependSingle(parent, this);
+        });
+    }
+
+    return this;
+  }
+
+  function _prependSingle(parent, child) {
+    var children = parent.children();
+    var node = null;
+    if (children.length > 0)
+      node = children.get(0).node;
+
+    parent.node.insertBefore(child.node, node);
+  }
+
+  function _children(selector) {
+    if (this instanceof GameNode) {
+      if (!_isStringPresent(selector))
+        selector = '*';
+
+      var children = this.node.children || this.node.childNodes;
+
+      var nodes = [];
+      for (var index = 0; index < children.length; index++) {
+        var node = new GameNode(children[index]);
+        if (node.matches(selector))
+          nodes.push(node);
+      }
+
+      return new GameNodes(nodes);
+    }
+
+    return new GameNodes(this.map(function() {
+      return this.children(selector);
+    }));
+  }
+
   // Classes
   function GameNodes(nodes) {
     var elements = _toNodesList(nodes);
@@ -490,6 +565,7 @@
     this.live = _live;
     this.get = _get;
     this.find = _find;
+    this.children = _children;
     this.match = _match;
     this.flatten = _flatten;
     this.filter = _filter;
@@ -519,6 +595,7 @@
 
     this.matches = _matches;
     this.find = _find;
+    this.children = _children;
     this.closest = _closest;
 
     this.styleNames = _processClassNames(node.className);
@@ -532,5 +609,8 @@
     this.data = _data;
     this.removeData = _removeData;
     this.setData = _setData;
+
+    this.prepend = _prepend;
+    this.append = _append;
   }
 })(document, window);

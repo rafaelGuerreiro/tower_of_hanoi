@@ -1,27 +1,32 @@
 ;(function($, document, window, undefined) {
   'use strict';
 
+  var MAX_TILES = 9;
+
   var game = [[], [], []];
   var activeTile = null;
 
+  $.game = {
+    initialize: _initialize,
+    selectTile: _selectTile
+  };
 
-  $(document).on('keypress keydown keyup', function(event) {
-    console.log(event);
-    console.log(String.fromCharCode(event.which));
+  // functions
+  function _initialize(amount) {
+    if (typeof amount !== 'number' || amount > 9 || amount < 3)
+      return;
 
-    return false;
-  });
+    _reset();
 
-  $('.game-container').live('click', '.column-container', function() {
-    var column = this.children('.column').get(0);
-    _selectTile(column, column.data('column'));
-  });
-
-  (function initialize() {
     $('.tile').each(function() {
+      var tileIndex = this.data('tile');
+      if (tileIndex >= amount)
+        return;
+
+      this.removeClass('hide');
+
       var column = this.parent();
       var columnIndex = column.data('column');
-      var tileIndex = this.data('tile');
 
       game[columnIndex].splice(tileIndex, 0, {
         nodes: {
@@ -32,10 +37,43 @@
         column: columnIndex
       });
     });
-  })();
+  }
 
-  // functions
-  function _selectTile(column, index) {
+  function _reset() {
+    game = [[], [], []];
+    activeTile = null;
+
+    $('.game-container').get(0).setInnerHtml(_buildGameSetup());
+  }
+
+  function _buildGameSetup() {
+    var gameSetup = [];
+    for (var column = 0; column < 3; column++) {
+      gameSetup.push('<div class="column-container"><div class="column" data-column="')
+      gameSetup.push(column);
+      gameSetup.push('">');
+
+      if (column === 0)
+        for (var tile = 0; tile < MAX_TILES; tile++) {
+          gameSetup.push('<div class="tile tile-');
+          gameSetup.push(tile + 1);
+          gameSetup.push(' hide" data-tile="');
+          gameSetup.push(tile);
+          gameSetup.push('"></div>');
+        }
+
+      gameSetup.push('</div><div class="tile-base"></div></div>');
+    }
+
+    return gameSetup.join('');
+  }
+
+  function _selectTile(index) {
+    if (typeof index !== 'number' || index > 2 || index < 0)
+      return;
+
+    var column = $('.game-container .column').get(index);
+
     if (!activeTile)
       _activateTile(column, index);
     else if (activeTile.column === index)

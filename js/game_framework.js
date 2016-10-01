@@ -119,21 +119,21 @@
     _bubbleUp(target, selector, callback, event, this);
   }
 
-  function _on(events, selector, callback) {
+  function _on(events, callback) {
     if (!_isFunction(callback))
       return this;
 
-    var events = event.split(/\s+/g);
+    var events = events.split(/\s+/g);
 
     if (this instanceof GameNode)
-      return _invoke.call(this, events, selector, callback, _invokeOn);
+      return _invoke.call(this, events, undefined, callback, _invokeOn);
 
     return this.each(function() {
-      _invoke.call(this, events, selector, callback, _invokeOn);
+      _invoke.call(this, events, undefined, callback, _invokeOn);
     });
   }
 
-  function _invokeOn(event, selector, callback) {
+  function _invokeOn(event, _selector, callback) {
     _invokeEventCallback(this, callback, event, this);
   }
 
@@ -154,6 +154,40 @@
       e.preventDefault();
       e.stopPropagation();
     }
+  }
+
+  function _trigger(event) {
+    if (!_isStringPresent(event))
+      return this;
+
+    if (this instanceof GameNode) {
+      event = _createEvent(event);
+
+       if (document.createEvent)
+         this.node.dispatchEvent(event);
+       else
+         this.node.fireEvent("on" + event.eventType, event);
+
+      return this;
+    }
+
+    return this.each(function() {
+      this.trigger(event);
+    });
+  }
+
+  function _createEvent(eventName) {
+    var event;
+    if (document.createEvent) {
+      event = document.createEvent("HTMLEvents");
+      event.initEvent(eventName, true, true);
+    } else {
+      event = document.createEventObject();
+      event.eventType = eventName;
+    }
+    event.eventName = eventName;
+
+    return event;
   }
 
   function _closest(selector) {
@@ -604,6 +638,22 @@
     }));
   }
 
+  function _setInnerHtml(html) {
+    if (!_isStringPresent(html))
+      html = '';
+
+    this.node.innerHTML = html;
+    return this;
+  }
+
+  function _setInnerText(text) {
+    if (!_isStringPresent(text))
+      text = '';
+
+    this.node.innerText = text;
+    return this;
+  }
+
   // Classes
   function GameNodes(nodes) {
     var elements = _toNodesList(nodes);
@@ -613,6 +663,7 @@
     this.map = _map;
     this.live = _live;
     this.on = _on;
+    this.trigger = _trigger;
     this.get = _get;
     this.find = _find;
     this.children = _children;
@@ -646,6 +697,7 @@
     this.matches = _matches;
     this.find = _find;
     this.on = _on;
+    this.trigger = _trigger;
     this.children = _children;
     this.closest = _closest;
 
@@ -663,5 +715,8 @@
 
     this.prepend = _prepend;
     this.append = _append;
+
+    this.setInnerHtml = _setInnerHtml;
+    this.setInnerText = _setInnerText;
   }
 })(document, window);

@@ -2,6 +2,10 @@ body {
   background-color: #ddd;
 }
 
+label .form-control {
+  font-weight: normal;
+}
+
 .centred-container {
   width: 80%;
   margin: 0 auto;
@@ -11,6 +15,11 @@ body {
 .developed-by {
   text-align: center;
   font-size: 0.9em;
+}
+
+.game-board {
+  border: 1px solid black;
+  margin-top: 10px;
 }
 
 .game-main-container {

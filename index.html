@@ -17,7 +17,25 @@
     </header>
 
     <main class="centred-container game-main-container">
-      some text
+      <div class="game-controller-container clearfix">
+        <div class="autoplay-controllers pull-right">
+          <button disabled="disabled" class="btn btn-success btn-lg autoplay start-autoplay">
+            Play for me!
+          </button>
+          <button disabled="disabled" class="btn btn-warning btn-lg autoplay stop-autoplay hide">
+            Okay! Stop playing!
+          </button>
+        </div>
+
+        <div class="tile-selection row">
+          <label class="col-xs-8 col-md-6">
+            Select the amount of tiles:
+            <select class="tiles-amount form-control"></select>
+          </label>
+        </div>
+      </div>
+      <!-- <canvas class="game-board">
+      </canvas> -->
 
       <div class="game-container">
       </div>
@@ -25,6 +43,7 @@
 
     <script type="text/javascript" src="js/game_framework.js"></script>
     <script type="text/javascript" src="js/game_controller.js"></script>
+    <script type="text/javascript" src="js/game_drawing.js"></script>
     <script type="text/javascript" src="js/time.js"></script>
     <script type="text/javascript" src="js/score.js"></script>
     <script type="text/javascript" src="js/user_plays.js"></script>

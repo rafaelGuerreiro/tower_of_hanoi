@@ -11,7 +11,27 @@
     selectTile: _selectTile
   };
 
+  $('.tiles-amount').on('change', _initializeGame);
+
+  (function init() {
+    var options = ['<option value="0">Select the size</option>'];
+    for (var amount = 3; amount <= MAX_TILES; amount++) {
+      options.push('<option value="');
+      options.push(amount);
+      options.push('">');
+      options.push(amount);
+      options.push(' tiles</option>');
+    }
+
+    $('.tiles-amount').get(0).setInnerHtml(options.join(''));
+  })();
+
   // functions
+  function _initializeGame() {
+    console.log(this);
+    _initialize(this.val());
+  }
+
   function _initialize(amount) {
     if (typeof amount !== 'number' || amount > 9 || amount < 3)
       return;

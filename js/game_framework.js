@@ -305,7 +305,7 @@
     var filter = [];
     this.each(function() {
       if (this.matches(selector))
-        filter.add(this);
+        filter.push(this);
     });
 
     return new GameNodes(filter);
@@ -317,12 +317,16 @@
 
     if (this instanceof GameNode) {
       var toAdd = _processClassNames(classes);
+      var obj = this;
 
-      this.styleNames.each(function() {
+      obj.styleNames.each(function() {
         toAdd.remove(this);
       });
+
       if (toAdd.length > 0)
-        this.styleNames.push(toAdd);
+        toAdd.each(function() {
+          obj.styleNames.push(this);
+        });
 
       return _updateClassNames.call(this);
     }
@@ -654,6 +658,14 @@
     return this;
   }
 
+  function _val(value) {
+    if (value === undefined)
+      return this.node.value;
+
+    this.node.value = value;
+    return this;
+  }
+
   // Classes
   function GameNodes(nodes) {
     var elements = _toNodesList(nodes);
@@ -700,6 +712,8 @@
     this.trigger = _trigger;
     this.children = _children;
     this.closest = _closest;
+
+    this.val = _val;
 
     this.styleNames = _processClassNames(node.className);
 

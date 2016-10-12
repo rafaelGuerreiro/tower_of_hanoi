@@ -2,11 +2,17 @@
   'use strict';
 
   $.drawing = {};
+
+  var sprite = undefined;
+  var tiles = undefined;
   var context = undefined;
 
   (function initialize() {
+    sprite = _loadSprite();
+    tiles = _buildTiles();
+
     var node = $('.game-main-container').get(0);
-    $.drawing.dimension = calculateWindowDimensions(node);
+    $.drawing.dimension = _calculateWindowDimensions(node);
 
     var canvasHtml = [
       '<canvas class="game-board" width="',
@@ -21,12 +27,23 @@
     $.drawing.context = $.drawing.canvas.node.getContext('2d');
     context = $.drawing.context;
 
-
-    _drawTile(95);
+    _drawTile(tiles.nineth);
   })();
 
   // Functions
-  function calculateWindowDimensions(gameNode) {
+  function _loadSprite() {}
+
+  function _buildTiles() {
+    return [
+      'first', 'second', 'third',
+      'fourth', 'fifth', 'sixth',
+      'seventh', 'eighth', 'nineth'
+    ].map(function() {
+      return this;
+    });
+  }
+
+  function _calculateWindowDimensions(gameNode) {
     var style = window.getComputedStyle(gameNode.node, null);
 
     var width = toNumber(style.getPropertyValue('width'));
@@ -40,6 +57,14 @@
       return parseInt(text.replace(/([^\d|\.|\-|\+]+)/g, ''), 10);
     }
   }
+
+  function _drawTile(size) {
+
+
+
+  }
+
+  // ctx.translate(100, 50); // change relative origin (0, 0)
 
 
   // var ctx = $('.game-board').get(0).node.getContext('2d');
@@ -97,24 +122,4 @@
   // for (var index = 0; index < 4; index++) {
   // }
   //
-
-  function _drawTile(size) {
-    size = ($.drawing.dimension.width * size) / 100;
-
-    context.save();
-    context.translate(200, 200);
-    for (var index = 0; index < 4; index++) {
-      context.rotate(Math.PI / 2);
-
-      context.beginPath();
-      context.moveTo(20, 10);
-      context.lineTo(80, 10);
-      context.quadraticCurveTo(90, 10, 90, 20);
-      context.stroke();
-    }
-    context.restore();
-  }
-
-  // ctx.translate(100, 50); // change relative origin (0, 0)
-
 })($, document, window);

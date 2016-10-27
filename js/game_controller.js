@@ -28,64 +28,32 @@
 
   // functions
   function _initializeGame() {
-    console.log(this);
     _initialize(this.val());
   }
 
   function _initialize(amount) {
-    if (typeof amount !== 'number' || amount > 9 || amount < 3)
+    amount = Number(amount);
+    if (isNaN(amount) || amount > 9 || amount < 3)
       return;
 
     _reset();
 
-    $('.tile').each(function() {
-      var tileIndex = this.data('tile');
-      if (tileIndex >= amount)
-        return;
-
-      this.removeClass('hide');
-
-      var column = this.parent();
-      var columnIndex = column.data('column');
-
-      game[columnIndex].splice(tileIndex, 0, {
-        nodes: {
-          tile: this,
-          column: column
-        },
-        tile: tileIndex,
-        column: columnIndex
+    for (var tile = 0; tile < amount; tile++)
+      game[0].splice(tile, 0, {
+        tile: tile,
+        column: 0
       });
-    });
+
+    _draw();
   }
 
   function _reset() {
     game = [[], [], []];
     activeTile = null;
-
-    $('.game-container').get(0).setInnerHtml(_buildGameSetup());
   }
 
-  function _buildGameSetup() {
-    var gameSetup = [];
-    for (var column = 0; column < 3; column++) {
-      gameSetup.push('<div class="column-container"><div class="column" data-column="')
-      gameSetup.push(column);
-      gameSetup.push('">');
-
-      if (column === 0)
-        for (var tile = 0; tile < MAX_TILES; tile++) {
-          gameSetup.push('<div class="tile tile-');
-          gameSetup.push(tile + 1);
-          gameSetup.push(' hide" data-tile="');
-          gameSetup.push(tile);
-          gameSetup.push('"></div>');
-        }
-
-      gameSetup.push('</div><div class="tile-base"></div></div>');
-    }
-
-    return gameSetup.join('');
+  function _draw() {
+    $.drawing.draw(game, activeTile);
   }
 
   function _selectTile(index) {

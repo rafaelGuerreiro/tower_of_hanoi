@@ -8,8 +8,8 @@
   var context = undefined;
 
   (function initialize() {
-    sprite = _loadSprite();
     tiles = _buildTiles();
+    _loadSprite();
 
     var node = $('.game-main-container').get(0);
     $.drawing.dimension = _calculateWindowDimensions(node);
@@ -24,23 +24,68 @@
     node.find('.game-container').get(0).setInnerHtml(canvasHtml);
 
     $.drawing.canvas = node.find('.game-board').get(0);
-    $.drawing.context = $.drawing.canvas.node.getContext('2d');
-    context = $.drawing.context;
-
-    _drawTile(tiles.nineth);
+    context = $.drawing.canvas.node.getContext('2d');
+    $.drawing.context = context;
+    $.drawing.draw = _draw;
   })();
 
   // Functions
-  function _loadSprite() {}
+  function _loadSprite() {
+    var img = new Image();
+    img.onload = function() {
+      sprite = img;
+      _spriteLoaded();
+    };
+    img.src = 'images/sprite.png';
+  }
+
+  function _spriteLoaded() {
+    // for (var index = 0; index < 9; index++)
+    //   _drawTile(tiles[index], 0, index * 31);
+    // DRAW GAME
+  }
+
+  function _draw(game, activeTile) {
+    _clear();
+
+    var tileHeight = 31;
+
+    for (var column = 0; column < game.length; column++) {
+      var x = column * 330;
+      var y = $.drawing.dimension.height - tileHeight;
+
+      for (var tile = game[column].length - 1; tile >= 0; tile--) {
+        // console.log("Drawing tile " + (tile + 1) + " at (" + x + ", " + y + ").");
+        _drawTile(tiles[tile], x, y);
+        y -= tileHeight;
+      }
+    }
+  }
+
+  function _clear() {
+    context.clearRect(0, 0, $.drawing.dimension.width, $.drawing.dimension.height);
+  }
 
   function _buildTiles() {
-    return [
+    var tiles = {};
+
+    [
       'first', 'second', 'third',
       'fourth', 'fifth', 'sixth',
       'seventh', 'eighth', 'nineth'
-    ].map(function() {
-      return this;
+    ].each(function(index) {
+      tiles[this] = {
+        draw: function(position) {
+          console.log("Drawing tile " + (index + 1) + " at (" + position.x + ", " + position.y + ").");
+          // context.drawImage(sprite, sx, sy, sw, sh, dx, dy, dw, dh);
+          context.drawImage(sprite, 0, (index * 40 + 10), 330, 33, position.x, position.y, 330, 33);
+        }
+      };
+
+      tiles[index] = tiles[this];
     });
+
+    return tiles;
   }
 
   function _calculateWindowDimensions(gameNode) {
@@ -51,17 +96,18 @@
       width -= toNumber(style.getPropertyValue('padding-' + this));
     });
 
-    return { width: width, height: 300 }
+    return { width: width, height: 300 };
 
     function toNumber(text) {
       return parseInt(text.replace(/([^\d|\.|\-|\+]+)/g, ''), 10);
     }
   }
 
-  function _drawTile(size) {
-
-
-
+  function _drawTile(tile, x, y) {
+    tile.draw({
+      x: x,
+      y: y
+    });
   }
 
   // ctx.translate(100, 50); // change relative origin (0, 0)

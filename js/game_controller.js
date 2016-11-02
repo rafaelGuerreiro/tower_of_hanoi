@@ -6,9 +6,12 @@
   var game = [[], [], []];
   var activeTile = null;
 
+  var queue = [];
+  var animating = false;
+
   $.game = {
     initialize: _initialize,
-    selectTile: _selectTile
+    play: _play
   };
 
   $('.tiles-amount').on('change', _initializeGame);
@@ -50,52 +53,97 @@
   function _reset() {
     game = [[], [], []];
     activeTile = null;
+
+    $.drawing.clear();
   }
 
   function _draw() {
     $.drawing.draw(game, activeTile);
   }
 
-  function _selectTile(index) {
+  function _play(index) {
     if (typeof index !== 'number' || index > 2 || index < 0)
       return;
 
-    var column = $('.game-container .column').get(index);
+    _queue(index);
+  }
 
+  function _queue(index) {
+    if (animating)
+      queue.push(index);
+    else
+      _invokeAction(index);
+  }
+
+  function _invokeAction(index) {
     if (!activeTile)
-      _activateTile(column, index);
+      _activateTile(index);
     else if (activeTile.column === index)
       _unselectTile();
     else
-      _moveTileTo(column, index);
+      _moveTileTo(index);
   }
 
-  function _activateTile(column, index) {
-    var tile = column.find('.tile').get(0);
-    if (tile) {
-      tile.addClass('active');
-      activeTile = game[index][0];
-    }
+  function _activateTile(index) {
+    var tile = game[index][0];
+    if (!tile)
+      return;
+
+    _animate($.drawing.selectTile, tile.tile, function() {
+      activeTile = tile;
+    });
   }
 
   function _unselectTile() {
-    activeTile.nodes.tile.removeClass('active');
-    activeTile = null;
+    _animate($.drawing.unselectTile, activeTile.tile, function() {
+      activeTile = null;
+    });
   }
 
-  function _moveTileTo(column, index) {
+  function _moveTileTo(index) {
     if (!_isAbleToMove(index))
       return;
 
-    game[activeTile.column].remove(activeTile);
-    game[index].splice(0, 0, activeTile);
+    _animate($.drawing.moveTileTo, index, activeTile.tile, function() {
+      game[activeTile.column].remove(activeTile);
+      game[index].splice(0, 0, activeTile);
 
-    activeTile.column = index;
-    activeTile.nodes.column = column;
+      activeTile.column = index;
+      _unselectTile();
+    });
+  }
 
-    column.prepend(activeTile.nodes.tile);
+  function _animate(fn) {
+    if (typeof fn !== 'function')
+      return;
 
-    _unselectTile();
+    var args = Array.prototype.slice.call(arguments, 1);
+
+    var callback = args[args.length - 1];
+    if (typeof callback === 'function')
+      args[args.length - 1] = _animationCallback(callback);
+    else
+      args.push(_animationCallback());
+
+    animating = true;
+    fn.apply(undefined, args);
+
+    function _animationCallback(otherCallback) {
+      return function() {
+        if (typeof callback === 'function')
+          otherCallback();
+
+        animating = false;
+        _invokeNext();
+      };
+    }
+  }
+
+  function _invokeNext() {
+    if (queue.length === 0)
+      return;
+
+    _invokeAction(queue.shift());
   }
 
   function _isAbleToMove(index) {

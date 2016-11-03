@@ -11,8 +11,15 @@
 
   $.game = {
     initialize: _initialize,
-    play: _play
+    selectTile: _selectTile
   };
+
+  // TODO disable the select box after the amount is entered
+  // TODO button to start and stop the game
+  // TODO score
+  // TODO timer
+  // TODO visual elements displaying the action that was made by the user
+  // TODO add labels below the game to let users know what to do
 
   $('.tiles-amount').on('change', _initializeGame);
 
@@ -30,6 +37,7 @@
   })();
 
   // functions
+
   function _initializeGame() {
     _initialize(this.val());
   }
@@ -41,27 +49,57 @@
 
     _reset();
 
-    for (var tile = 0; tile < amount; tile++)
-      game[0].splice(tile, 0, {
-        tile: tile,
-        column: 0
-      });
+    $('.tile').each(function() {
+      var tileIndex = this.data('tile');
+      if (tileIndex >= amount)
+        return;
 
-    _draw();
+      this.removeClass('hide');
+
+      var column = this.parent();
+      var columnIndex = column.data('column');
+
+      game[columnIndex].splice(tileIndex, 0, {
+        nodes: {
+          tile: this,
+          column: column
+        },
+        tile: tileIndex,
+        column: columnIndex
+      });
+    });
   }
 
   function _reset() {
     game = [[], [], []];
     activeTile = null;
 
-    $.drawing.clear();
+    $('.game-container').get(0).setInnerHtml(_buildGameSetup());
   }
 
-  function _draw() {
-    $.drawing.draw(game, activeTile);
+  function _buildGameSetup() {
+    var gameSetup = [];
+    for (var column = 0; column < 3; column++) {
+      gameSetup.push('<div class="column-container"><div class="column" data-column="')
+      gameSetup.push(column);
+      gameSetup.push('">');
+
+      if (column === 0)
+        for (var tile = 0; tile < MAX_TILES; tile++) {
+          gameSetup.push('<div class="tile tile-');
+          gameSetup.push(tile + 1);
+          gameSetup.push(' hide" data-tile="');
+          gameSetup.push(tile);
+          gameSetup.push('"></div>');
+        }
+
+      gameSetup.push('</div><div class="tile-base"></div></div>');
+    }
+
+    return gameSetup.join('');
   }
 
-  function _play(index) {
+  function _selectTile(index) {
     if (typeof index !== 'number' || index > 2 || index < 0)
       return;
 
@@ -76,41 +114,56 @@
   }
 
   function _invokeAction(index) {
+    var column = $('.game-container .column').get(index);
+
     if (!activeTile)
-      _activateTile(index);
+      _activateTile(column, index);
     else if (activeTile.column === index)
       _unselectTile();
     else
-      _moveTileTo(index);
+      _moveTileTo(column, index);
   }
 
-  function _activateTile(index) {
-    var tile = game[index][0];
-    if (!tile)
-      return;
+  function _activateTile(column, index) {
+    var tile = column.find('.tile').get(0);
+    if (tile) {
+      tile.addClass('active');
+      activeTile = game[index][0];
+    }
 
-    _animate($.drawing.selectTile, tile.tile, function() {
-      activeTile = tile;
-    });
+    // _animate($.drawing.selectTile, tile.tile, function() {
+    //   activeTile = tile;
+    // });
   }
 
   function _unselectTile() {
-    _animate($.drawing.unselectTile, activeTile.tile, function() {
-      activeTile = null;
-    });
+    activeTile.nodes.tile.removeClass('active');
+    activeTile = null;
+    // _animate($.drawing.unselectTile, activeTile.tile, function() {
+    //   activeTile = null;
+    // });
   }
 
-  function _moveTileTo(index) {
+  function _moveTileTo(column, index) {
     if (!_isAbleToMove(index))
       return;
 
-    _animate($.drawing.moveTileTo, index, activeTile.tile, function() {
-      game[activeTile.column].remove(activeTile);
-      game[index].splice(0, 0, activeTile);
+    game[activeTile.column].remove(activeTile);
+    game[index].splice(0, 0, activeTile);
 
-      activeTile.column = index;
-      _unselectTile();
-    });
+    activeTile.column = index;
+    activeTile.nodes.column = column;
+
+    column.prepend(activeTile.nodes.tile);
+    _unselectTile();
+
+    // _animate($.drawing.moveTileTo, index, activeTile.tile, function() {
+    //   game[activeTile.column].remove(activeTile);
+    //   game[index].splice(0, 0, activeTile);
+    //
+    //   activeTile.column = index;
+    //   _unselectTile();
+    // });
   }
 
   function _animate(fn) {

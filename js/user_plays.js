@@ -1,7 +1,8 @@
 ;(function($, document, window, undefined) {
   'use strict';
 
-  $(document).on('keypress', _selectTile);
+  $(document).on('keypress', _addShortcutsToTiles);
+  $('.game-container').live('click', '.column-container', _selectTile);
 
   var userInputsEnabled = true;
 
@@ -11,7 +12,7 @@
   }
 
   // functions
-  function _selectTile(event) {
+  function _addShortcutsToTiles(event) {
     if (!userInputsEnabled)
       return;
 
@@ -21,7 +22,15 @@
       return;
 
     var index = parseInt(number, 10) - 1;
-    $.game.play(index);
+    $('.game-container .column').get(index).trigger('click');
+  }
+
+  function _selectTile() {
+    if (!userInputsEnabled)
+      return;
+
+    var index = this.find('.column').get(0).data('column');
+    $.game.selectTile(index);
   }
 
   function _enableUserInputs() {

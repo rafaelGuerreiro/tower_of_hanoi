@@ -17,11 +17,6 @@ label .form-control {
   font-size: 0.9em;
 }
 
-.game-board {
-  border: 1px solid black;
-  margin-top: 10px;
-}
-
 .game-main-container {
   background-color: #fff;
   padding: 10px;

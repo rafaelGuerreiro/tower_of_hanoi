@@ -15,11 +15,13 @@
   };
 
   // TODO disable the select box after the amount is entered
-  // TODO button to start and stop the game
+  // TODO button to start and stop the game (space bar shortcut)
   // TODO score
   // TODO timer
   // TODO visual elements displaying the action that was made by the user
   // TODO add labels below the game to let users know what to do
+  // TODO add more than one player for multiplayer support
+  // TODO 3 methods of computer: easy, medium and hard
 
   $('.tiles-amount').on('change', _initializeGame);
 
@@ -93,7 +95,10 @@
           gameSetup.push('"></div>');
         }
 
-      gameSetup.push('</div><div class="tile-base"></div></div>');
+      gameSetup.push('</div><div class="tile-base"></div>');
+      gameSetup.push('<div class="shortcut"><span class="label label-success">');
+      gameSetup.push(column + 1);
+      gameSetup.push('</span></div></div>');
     }
 
     return gameSetup.join('');

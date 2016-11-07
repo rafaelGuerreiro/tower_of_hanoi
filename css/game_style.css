@@ -77,6 +77,11 @@ label .form-control {
   box-shadow: 0px 0px 1px #222;
 }
 
+.column-container>.shortcut {
+  text-align: center;
+  font-size: 1.25em;
+}
+
 .tile.tile-1 { width: 15%; background-color: Crimson; }
 .tile.tile-2 { width: 25%; background-color: DarkGreen; }
 .tile.tile-3 { width: 35%; background-color: DarkBlue; }
@@ -105,5 +110,11 @@ label .form-control {
   .game-main-container {
     border-radius: 0px;
     box-shadow: none;
+  }
+}
+
+@media (min-width: 992px) {
+  .middle-md {
+    margin-top: 18px;
   }
 }

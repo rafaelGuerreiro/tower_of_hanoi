@@ -17,46 +17,54 @@
     </header>
 
     <main class="centred-container game-main-container">
-      <div class="game-controller-container clearfix">
-        <div class="autoplay-controllers pull-right">
-          <button disabled="disabled" class="btn btn-success btn-lg autoplay start-autoplay">
-            Play for me!
-          </button>
-          <button disabled="disabled" class="btn btn-warning btn-lg autoplay stop-autoplay hide">
-            Okay! Stop playing!
-          </button>
-        </div>
+      <section class="game-setup-container row">
 
-        <div class="tile-selection row">
-          <label class="col-xs-8 col-md-6">
-            Select the amount of tiles:
-            <select class="tiles-amount form-control"></select>
+
+
+      </section>
+      <section class="game-main-container hide">
+        <div class="game-controller-container clearfix">
+          <div class="autoplay-controllers pull-right">
+            <button disabled="disabled" class="btn btn-success btn-lg autoplay start-autoplay">
+              Play for me!
+            </button>
+            <button disabled="disabled" class="btn btn-warning btn-lg autoplay stop-autoplay hide">
+              Okay! Stop playing!
+            </button>
+          </div>
+
+          <div class="tile-selection row">
+            <label class="col-xs-8 col-md-6">
+              Select the amount of tiles:
+              <select class="tiles-amount form-control"></select>
+            </label>
+          </div>
+        </div>
+        <div class="game-container">
+        </div>
+        <hr />
+        <div class="row">
+          <label class="col-xs-12 col-md-6">
+            Select player type
+            <select class="new-player-type form-control">
+              <option value="">Select</option>
+              <option value="human">Human</option>
+              <option value="easy">Computer (easy)</option>
+              <option value="medium">Computer (medium)</option>
+              <option value="hard">Computer (hard)</option>
+            </select>
           </label>
+          <div class="col-xs-12 col-md-6 middle-md">
+            <button class="btn btn-warning btn-block add-player">
+              Add player
+            </button>
+          </div>
         </div>
-      </div>
-      <div class="game-container">
-      </div>
-      <hr />
-      <div class="row">
-        <label class="col-xs-12 col-md-6">
-          Select player type
-          <select class="new-player-type form-control">
-            <option value="">Select</option>
-            <option value="human">Human</option>
-            <option value="easy">Computer (easy)</option>
-            <option value="medium">Computer (medium)</option>
-            <option value="hard">Computer (hard)</option>
-          </select>
-        </label>
-        <div class="col-xs-12 col-md-6 middle-md">
-          <button class="btn btn-warning btn-block add-player">
-            Add player
-          </button>
-        </div>
-      </div>
+      </section>
     </main>
 
     <script type="text/javascript" src="js/game_framework.js"></script>
+    <script type="text/javascript" src="js/game_setup.js"></script>
     <script type="text/javascript" src="js/game_controller.js"></script>
     <script type="text/javascript" src="js/time.js"></script>
     <script type="text/javascript" src="js/score.js"></script>

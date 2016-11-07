@@ -14,6 +14,7 @@
   $.isPresent = _isPresent;
   $.isStringPresent = _isStringPresent;
   $.isFunction = _isFunction;
+  $.argumentsAsArray = _argumentsAsArray;
 
   window.$ = $;
 
@@ -40,6 +41,10 @@
   }
 
   // Helper functions
+  function _argumentsAsArray(args) {
+    return Array.prototype.slice.call(args, 0);
+  }
+
   function _isEmpty(value) {
     if (!value)
       return true;
@@ -504,10 +509,46 @@
     if (nodes instanceof NodeList)
       return nodes;
 
-    if (nodes instanceof Array || nodes instanceof GameNodes)
+    if (nodes instanceof GameNodes)
       return nodes.flatten();
 
-    return [nodes].flatten();
+    // TODO make node
+
+    if (!Array.isArray(nodes))
+      nodes = [nodes];
+
+    var converted = [];
+    for (var index = 0; index < nodes.length; index++) {
+      var node = _toNode(nodes[index]);
+
+      if (Array.isArray(node) || node instanceof NodeList)
+        for (var ix = 0; ix < node.length; ix++)
+          converted.push(node[ix]);
+    }
+
+    return converted;
+  }
+
+  function _toNode(node) {
+    if (node instanceof Node)
+      return [node];
+    if (node instanceof NodeList)
+      return node;
+    if (node instanceof GameNode)
+      return [node.node];
+    if (node instanceof GameNodes)
+      return node.flatten();
+
+    if (_isEmpty(node))
+      return undefined;
+
+    var container = document.createElement('div');
+
+    console.log(node);
+
+    container.innerHTML = node;
+
+    return container.childNodes;
   }
 
   function _getDataAttributes(node) {
@@ -568,47 +609,44 @@
   }
 
   function _append(/* node1, node2 */) {
-    var length = arguments.length;
-    if (length === 0)
+    var args = _argumentsAsArray(arguments);
+    if (this instanceof GameNode) {
+      var length = args.length;
+      if (length === 0)
+        return this;
+
+      var parent = this.node;
+      new GameNodes(args).each(function() {
+        parent.appendChild(this.node);
+      });
+
       return this;
-
-    var parent = this;
-    for (var index = 0; index < length; index++) {
-      var node = arguments[index];
-
-      if (node instanceof GameNode)
-        _appendSingle(parent, node);
-      else if (node instanceof GameNodes)
-        node.each(function() {
-          _appendSingle(parent, this);
-        });
     }
 
-    return this;
-  }
-
-  function _appendSingle(parent, child) {
-    parent.node.appendChild(child.node);
+    return this.each(function() {
+      this.append.apply(this, args);
+    });
   }
 
   function _prepend(/* node1, node2 */) {
-    var length = arguments.length;
-    if (length === 0)
+    var args = arguments;
+    if (this instanceof GameNode) {
+      var length = args.length;
+      if (length === 0)
+        return this;
+
+      var parent = this;
+
+      new GameNodes(args).each(function() {
+        _prependSingle(parent, this.node);
+      });
+
       return this;
-
-    var parent = this;
-    for (var index = length - 1; index >= 0; index--) {
-      var node = arguments[index];
-
-      if (node instanceof GameNode)
-        _prependSingle(parent, node);
-      else if (node instanceof GameNodes)
-        node.each(function() {
-          _prependSingle(parent, this);
-        });
     }
 
-    return this;
+    return this.each(function() {
+      this.prepend.apply(this, args);
+    });
   }
 
   function _prependSingle(parent, child) {
@@ -617,7 +655,7 @@
     if (children.length > 0)
       node = children.get(0).node;
 
-    parent.node.insertBefore(child.node, node);
+    parent.node.insertBefore(child, node);
   }
 
   function _children(selector) {
@@ -643,27 +681,45 @@
   }
 
   function _setInnerHtml(html) {
-    if (!_isStringPresent(html))
-      html = '';
+    if (this instanceof GameNode) {
+      if (!_isStringPresent(html))
+        html = '';
 
-    this.node.innerHTML = html;
-    return this;
+      this.node.innerHTML = html;
+      return this;
+    }
+
+    return new GameNodes(this.map(function() {
+      return this.setInnerHtml(html);
+    }));
   }
 
   function _setInnerText(text) {
-    if (!_isStringPresent(text))
-      text = '';
+    if (this instanceof GameNode) {
+      if (!_isStringPresent(text))
+        text = '';
 
-    this.node.innerText = text;
-    return this;
+      this.node.innerText = text;
+      return this;
+    }
+
+    return new GameNodes(this.map(function() {
+      return this.setInnerText(text);
+    }));
   }
 
   function _val(value) {
-    if (value === undefined)
-      return this.node.value;
+    if (this instanceof GameNode) {
+      if (value === undefined)
+        return this.node.value;
 
-    this.node.value = value;
-    return this;
+      this.node.value = value;
+      return this;
+    }
+
+    return new GameNodes(this.map(function() {
+      return this.val(value);
+    }));
   }
 
   // Classes
@@ -684,6 +740,8 @@
     this.filter = _filter;
     this.closest = _closest;
 
+    this.val = _val;
+
     this.addClass = _addClass;
     this.removeClass = _removeClass;
     this.toggleClass = _toggleClass;
@@ -692,6 +750,12 @@
     this.data = _data;
     this.removeData = _removeData;
     this.setData = _setData;
+
+    this.prepend = _prepend;
+    this.append = _append;
+
+    this.setInnerHtml = _setInnerHtml;
+    this.setInnerText = _setInnerText;
 
     for (var index = 0; index < elements.length; index++) {
       var el = elements[index];

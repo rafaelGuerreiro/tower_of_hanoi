@@ -35,7 +35,7 @@
       options.push(' tiles</option>');
     }
 
-    $('.tiles-amount').get(0).setInnerHtml(options.join(''));
+    $('.tiles-amount').setInnerHtml(options.join(''));
   })();
 
   // functions

@@ -5,7 +5,8 @@
   var MAX_TILES = 9;
 
   (function init() {
-    _createNewSetupConfigurationBox();
+    for (var setups = 0; setups < 2; setups++)
+      _createNewSetupConfigurationBox();
   })();
 
   // functions

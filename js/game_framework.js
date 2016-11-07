@@ -543,11 +543,7 @@
       return undefined;
 
     var container = document.createElement('div');
-
-    console.log(node);
-
     container.innerHTML = node;
-
     return container.childNodes;
   }
 

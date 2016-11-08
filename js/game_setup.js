@@ -3,6 +3,7 @@
 
   var MIN_TILES = 3;
   var MAX_TILES = 9;
+  var PLAYERS_LIMIT = 4;
 
   var players = 0;
 
@@ -22,7 +23,7 @@
     players++;
     $container.find('.new-player-box').insertBefore(_buildSetupConfigurationBox(arg1));
 
-    if (players >= 4)
+    if (players >= PLAYERS_LIMIT)
       $container.find('.new-player-box').addClass('hide');
   }
 
@@ -30,7 +31,7 @@
     players--;
     $(this).closest('.setup-selection-container').remove();
 
-    if (players < 4)
+    if (players < PLAYERS_LIMIT)
       $container.find('.new-player-box').removeClass('hide');
   }
 

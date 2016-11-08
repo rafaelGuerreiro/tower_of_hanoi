@@ -4,32 +4,50 @@
   var MIN_TILES = 3;
   var MAX_TILES = 9;
 
+  var players = 0;
+
   var $body = $(document.body);
+  var $container = $('.game-setup-container');
 
   (function init() {
     _createAddNewSetupConfigurationBox();
-    _createNewSetupConfigurationBox();
+    _createNewSetupConfigurationBox(true);
 
     $body.live('click', '.add-new-player-box', _createNewSetupConfigurationBox);
+    $body.live('click', '.setup-selection-container .close', _removeSetupConfigurationBox);
   })();
 
   // functions
-  function _createNewSetupConfigurationBox() {
-    $('.game-setup-container').prepend(_buildSetupConfigurationBox());
+  function _createNewSetupConfigurationBox(arg1) {
+    players++;
+    $container.find('.new-player-box').insertBefore(_buildSetupConfigurationBox(arg1));
+
+    if (players >= 4)
+      $container.find('.new-player-box').addClass('hide');
+  }
+
+  function _removeSetupConfigurationBox() {
+    players--;
+    $(this).closest('.setup-selection-container').remove();
+
+    if (players < 4)
+      $container.find('.new-player-box').removeClass('hide');
   }
 
   function _createAddNewSetupConfigurationBox() {
-    $('.game-setup-container').append(_buildAddSetupConfigurationBox());
+    $container.append(_buildAddSetupConfigurationBox());
   }
 
-  function _buildSetupConfigurationBox() {
+  function _buildSetupConfigurationBox(hideCloseButton) {
     var setupBox = [
-      '<button class="close">&times;</button>',
       '<div class="player-setup">',
       '<label><input type="text" class="player-name form-control" placeholder="Name of the player" /></label>',
       '<label><select class="tiles-amount form-control">',
       '<option value="0">Select the amount of tiles</option>'
     ];
+
+    if (hideCloseButton !== true)
+      setupBox.splice(0, 0, '<button class="close">&times;</button>');
 
     for (var amount = MIN_TILES; amount <= MAX_TILES; amount++) {
       setupBox.push('<option value="');
@@ -76,16 +94,21 @@
       '<div class="add-new-player-helper-text">Add a new player.</div>',
       '<div class="add-new-player-plus-sign"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></div>',
       '</div>'
-    ]);
+    ], 'new-player-box');
   }
 
-  function _surroundConfigurationBox(content) {
+  function _surroundConfigurationBox(content, clazz) {
+    if (clazz === undefined || clazz === null || clazz.length === 0)
+      clazz = '';
+
     var surrounding = [
-      '<div class="setup-selection-container col-xs-12 col-sm-6 col-md-4 col-lg-3">',
+      '<div class="setup-selection-container col-xs-12 col-sm-6 col-md-4 col-lg-3 ',
+      clazz,
+      '">',
       '</div>'
     ];
 
-    Array.prototype.splice.apply(surrounding, [1, 0].concat(content));
+    Array.prototype.splice.apply(surrounding, [surrounding.length - 1, 0].concat(content));
     return surrounding.join('');
   }
 

@@ -625,14 +625,13 @@
   }
 
   function _prepend(/* node1, node2 */) {
-    var args = arguments;
+    var args = _argumentsAsArray(arguments);
     if (this instanceof GameNode) {
       var length = args.length;
       if (length === 0)
         return this;
 
       var parent = this;
-
       new GameNodes(args).each(function() {
         _prependSingle(parent, this.node);
       });

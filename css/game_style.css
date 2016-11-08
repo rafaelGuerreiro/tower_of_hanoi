@@ -82,6 +82,70 @@ label .form-control {
   font-size: 1.25em;
 }
 
+.game-setup-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  min-height: 200px;
+}
+
+.setup-selection-container {
+  display: flex;
+  padding: 10px;
+  float: none;
+  position: relative;
+}
+
+.setup-selection-container>button.close {
+  position: absolute;
+  right: 15px;
+}
+
+.setup-selection-container>.player-setup, .setup-selection-container>.add-new-player-box {
+  border: 2px dashed #999;
+  padding: 10px 20px;
+  border-radius: 10px;
+  height: 100%;
+  width: 100%;
+}
+
+.setup-selection-container>.player-setup label {
+  display: block;
+}
+
+.add-new-player-box {
+  opacity: 0.25;
+  cursor: pointer;
+}
+
+.add-new-player-box:hover {
+  opacity: 1;
+}
+
+.add-new-player-helper-text {
+  text-align: center;
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+.add-new-player-plus-sign {
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  font-size: 1.6em;
+  padding-top: 4.25%;
+  padding-left: 1%;
+  margin: 12.5% auto 0;
+
+  background-color: #eee;
+  box-shadow: inset 1px 1px 0px #fff;
+
+  text-shadow: -1px -1px 0px #fff;
+}
+
 .tile.tile-1 { width: 15%; background-color: Crimson; }
 .tile.tile-2 { width: 25%; background-color: DarkGreen; }
 .tile.tile-3 { width: 35%; background-color: DarkBlue; }

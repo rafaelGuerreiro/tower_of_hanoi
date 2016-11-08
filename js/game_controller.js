@@ -26,16 +26,7 @@
   $('.tiles-amount').on('change', _initializeGame);
 
   (function init() {
-    var options = ['<option value="0">Select the size</option>'];
-    for (var amount = 3; amount <= MAX_TILES; amount++) {
-      options.push('<option value="');
-      options.push(amount);
-      options.push('">');
-      options.push(amount);
-      options.push(' tiles</option>');
-    }
 
-    $('.tiles-amount').setInnerHtml(options.join(''));
   })();
 
   // functions

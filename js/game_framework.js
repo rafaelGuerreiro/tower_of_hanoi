@@ -361,7 +361,7 @@
     });
   }
 
-  function _toggleClass(classes) {
+  function _toggleClass(classes, condition) {
     if (!_isStringPresent(classes))
       return this;
 
@@ -369,8 +369,13 @@
       var toToggle = _processClassNames(classes);
       var obj = this;
 
+      var useCondition = condition === true || condition === false;
+
       toToggle.each(function() {
-        if (obj.hasClass(this))
+        var remove = obj.hasClass(this);
+        if (useCondition) remove = !condition;
+
+        if (remove)
           obj.removeClass(this);
         else
           obj.addClass(this);
@@ -380,7 +385,7 @@
     }
 
     return this.each(function() {
-      this.toggleClass(classes);
+      this.toggleClass(classes, condition);
     });
   }
 

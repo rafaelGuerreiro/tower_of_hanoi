@@ -6,11 +6,11 @@
   }
 
   // functions
-  function _register(game) {
-    if (game.player.type !== 'human')
+  function _register(definition) {
+    if (definition.player.type !== 'human')
       return;
 
-    game.root.live('click', '.column-container', _selectTile(game.player));
+    definition.root.live('click', '.column-container', _selectTile(definition));
     // $(document).on('keypress', _addShortcutsToTiles);
   }
 
@@ -24,10 +24,10 @@
     $('.game-container .column').get(index).trigger('click');
   }
 
-  function _selectTile(player) {
+  function _selectTile(definition) {
     return function() {
       var index = this.find('.column').get(0).data('column');
-      $.game.selectTile(player.id, index);
+      $.game.selectTile(definition, index);
     };
   }
 })($, document, window);

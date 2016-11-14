@@ -23,7 +23,8 @@
     $container.live('click', '.setup-selection-container .close', _removeSetupConfigurationBox);
     $container.live('change', '.setup-selection-container .player-type', _toggleShortcutBox);
 
-    $container.live('change keyup', '.player-setup input, .player-setup select', _toggleInitGame);
+    $container.live('change', '.player-setup input, .player-setup select', _toggleInitGame);
+    $container.live('keyup', '.player-setup input', _toggleInitGameOrInitGame);
 
     $body.live('click', '.init-game', _initGame);
   })();
@@ -171,8 +172,15 @@
 
   function _toggleInitGame() {
     var valid = _isValidToInitGame();
-
     $setup.find('.init-game').attr('disabled', !valid);
+  }
+
+  function _toggleInitGameOrInitGame(e) {
+    var valid = _isValidToInitGame();
+    $setup.find('.init-game').attr('disabled', !valid);
+
+    if (valid && e.which === 13)
+      $setup.find('.init-game').trigger('click');
   }
 
   function _isValidToInitGame() {

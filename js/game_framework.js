@@ -826,6 +826,30 @@
     });
   }
 
+  function _style(name, value) {
+    if (this instanceof GameNode) {
+      var style = window.getComputedStyle(this.node);
+
+      if (_isEmpty(value))
+        return style.getPropertyValue(name);
+
+      if (!isNaN(value))
+        value += 'px';
+
+      this.node.style[name] = value;
+      return this;
+    }
+
+    if (_isEmpty(value))
+      return this.map(_callStyle);
+
+    return this.each(_callStyle);
+
+    function _callStyle() {
+      return this.style(name, value);
+    }
+  }
+
   // Classes
   function GameNodes(nodes) {
     var elements = _toNodesList(nodes);
@@ -867,6 +891,7 @@
 
     this.focus = _focus;
     this.attr = _attr;
+    this.style = _style;
 
     for (var index = 0; index < elements.length; index++) {
       var el = elements[index];
@@ -917,5 +942,6 @@
 
     this.focus = _focus;
     this.attr = _attr;
+    this.style = _style;
   }
 })(document, window);

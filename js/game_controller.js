@@ -3,9 +3,7 @@
 
   var MAX_TILES = 9;
 
-  var game = {};
-
-  var queue = {};
+  var playerDefinitions = {};
 
   $.game = {
     addPlayer: _addPlayer,
@@ -39,8 +37,9 @@
 
     _reset(player);
 
-    var root = game[player.id].root;
-    var board = game[player.id].board;
+    var definition = playerDefinitions[player.id];
+    var root = definition.root;
+    var board = definition.board;
 
     // use id
     root.find('.tile').each(function(index) {
@@ -61,24 +60,25 @@
   function _reset(player) {
     $container.append(_buildGameSetup(player));
 
-    game[player.id] = {
+    var definition = {
       player: player,
       board: [[], [], []],
       activeTile: null,
+      queue: [],
+      animating: false,
       root: $('.game-container').find('.game-board[data-id="' + player.id + '"]').get(0)
     };
 
     if (player.type === 'human')
-      $.user.register(game[player.id]);
+      $.user.register(definition);
 
-    queue[player.id] = [];
-    queue[player.id].animating = false;
+    playerDefinitions[player.id] = definition;
   }
 
   function _buildGameSetup(player) {
     var gameSetup = [
-      '<h3>',
-      player.name,
+      '<div class="game-board-container"><h3>',
+      _htmlSafe(player.name),
       '</h3>',
       '<div class="game-board" data-id="',
       player.id,
@@ -103,124 +103,138 @@
 
       if (player.shortcuts) {
         gameSetup.push('<div class="shortcut"><span class="label label-success">');
-        gameSetup.push(player.shortcuts[column]);
+        gameSetup.push(_htmlSafe(player.shortcuts[column]));
         gameSetup.push('</span></div>');
       }
 
       gameSetup.push('</div>');
     }
 
-    gameSetup.push('</div>');
+    gameSetup.push('</div></div>');
     return gameSetup.join('');
   }
 
-  function _selectTile(id, index) {
+  function _htmlSafe(text) {
+    var container = document.createElement('div');
+    container.innerText = text;
+    return container.innerHTML;
+  }
+
+  function _selectTile(definition, index) {
     if (typeof index !== 'number' || index > 2 || index < 0)
       return;
 
-    _queue(id, index);
+    _queue(definition, index);
   }
 
-  function _queue(id, index) {
-    if (queue[id].animating)
-      queue[id].push(index);
+  function _queueFirst(definition, index) {
+    if (definition.animating)
+      definition.queue.splice(0, 0, index);
     else
-      _invokeAction(id, index);
+      _invokeAction(definition, index);
   }
 
-  function _invokeAction(id, index) {
-    var player = game[id];
-    var column = player.root.find('.column').get(index);
-
-    if (!player.activeTile)
-      _activateTile(player, column, index);
-    else if (player.activeTile.column === index)
-      _unselectTile(player);
+  function _queue(definition, index) {
+    if (definition.animating)
+      definition.queue.push(index);
     else
-      _moveTileTo(player, column, index);
+      _invokeAction(definition, index);
   }
 
-  function _activateTile(player, column, index) {
+  function _invokeAction(definition, index) {
+    var column = definition.root.find('.column').get(index);
+
+    if (!definition.activeTile)
+      _activateTile(definition, column, index);
+    else if (definition.activeTile.column === index)
+      _unselectTile(definition);
+    else
+      _moveTileTo(definition, column, index);
+  }
+
+  function _activateTile(definition, column, index) {
     var tile = column.find('.tile').get(0);
-    if (tile) {
-      tile.addClass('active');
-      player.activeTile = game[index][0];
+    if (!tile)
+      return;
+
+    var activeTile = definition.board[index][0];
+    tile.addClass('active');
+
+    _animate(definition, activeTile, { top: 0 }, function() {
+      definition.activeTile = activeTile;
+    });
+  }
+
+  function _unselectTile(definition) {
+    _animate(definition, definition.activeTile, { top: 'initial' }, function() {
+      definition.activeTile.nodes.tile.removeClass('active');
+      definition.activeTile = null;
+    });
+  }
+
+  function _moveTileTo(definition, column, index) {
+    if (!_isAbleToMove(definition, index))
+      return;
+
+    var activeTile = definition.activeTile;
+
+    // TODO think about left;
+    _animate(definition, definition.activeTile, { left: 200 }, function() {
+      definition.board[activeTile.column].remove(activeTile);
+      definition.board[index].splice(0, 0, activeTile);
+
+      activeTile.column = index;
+      activeTile.nodes.column = column;
+
+      column.prepend(activeTile.nodes.tile);
+
+      _queueFirst(definition, index);
+    });
+  }
+
+  function _animate(definition, tileDefinition, style, callback) {
+    definition.animating = true;
+
+    var initial = {};
+    var steps = {};
+
+    Object.keys(style).each(function() {
+      console.log(tileDefinition);
+
+      initial[this] = tileDefinition.nodes.tile.style(this);
+
+      console.log(initial);
+
+      // steps[this] = initial[this] - style[this];
+    });
+
+    var interval = setInterval(function() {
+
+      _animationCallback();
+    }, 10);
+
+    function _animationCallback() {
+      if (typeof callback === 'function')
+        callback();
+
+      definition.animating = false;
+      _invokeNext(definition);
     }
-
-    // _animate($.drawing.selectTile, tile.tile, function() {
-    //   activeTile = tile;
-    // });
   }
 
-  function _unselectTile(player) {
-    player.activeTile.nodes.tile.removeClass('active');
-    player.activeTile = null;
-    // _animate($.drawing.unselectTile, activeTile.tile, function() {
-    //   activeTile = null;
-    // });
-  }
-
-  function _moveTileTo(player, column, index) {
-    if (!_isAbleToMove(player, index))
+  function _invokeNext(definition) {
+    if (definition.queue.length === 0)
       return;
 
-    player.board[activeTile.column].remove(activeTile);
-    player.board[index].splice(0, 0, activeTile);
-
-    player.activeTile.column = index;
-    player.activeTile.nodes.column = column;
-
-    column.prepend(activeTile.nodes.tile);
-    _unselectTile(player);
-
-    // _animate($.drawing.moveTileTo, index, activeTile.tile, function() {
-    //   game[activeTile.column].remove(activeTile);
-    //   game[index].splice(0, 0, activeTile);
-    //
-    //   activeTile.column = index;
-    //   _unselectTile();
-    // });
+    _invokeAction(definition, definition.queue.shift());
   }
 
-  function _animate(fn) {
-    if (typeof fn !== 'function')
-      return;
-
-    var args = Array.prototype.slice.call(arguments, 1);
-
-    var callback = args[args.length - 1];
-    if (typeof callback === 'function')
-      args[args.length - 1] = _animationCallback(callback);
-    else
-      args.push(_animationCallback());
-
-    animating = true;
-    fn.apply(undefined, args);
-
-    function _animationCallback(otherCallback) {
-      return function() {
-        if (typeof callback === 'function')
-          otherCallback();
-
-        animating = false;
-        _invokeNext();
-      };
-    }
-  }
-
-  function _invokeNext() {
-    if (queue.length === 0)
-      return;
-
-    _invokeAction(queue.shift());
-  }
-
-  function _isAbleToMove(player, index) {
-    var column = player.board[index];
+  function _isAbleToMove(definition, index) {
+    var column = definition.board[index];
 
     if (column.length === 0)
       return true;
 
-    return player.activeTile.tile < column[0].tile;
+    return definition.activeTile.tile < column[0].tile;
   }
 })($, document, window);

@@ -24,7 +24,25 @@ label .form-control {
   box-shadow: 0px 1px 2px #222;
 }
 
-.game-container>.game-board {
+.game-container {
+  margin: 0 -10px;
+}
+
+.game-board-container {
+  padding: 0 10px;
+}
+
+.game-board-container+.game-board-container {
+  border: 0;
+  border-top: 1px solid #ccc;
+  margin-top: 10px;
+}
+
+.game-board-container>h3 {
+  margin: 0;
+}
+
+.game-board {
   display: flex;
   flex-wrap: nowrap;
   justify-content: space-between;
@@ -32,7 +50,7 @@ label .form-control {
   height: 290px;
 }
 
-.game-container>.game-board>.column-container {
+.game-board>.column-container {
   display: flex;
   flex-flow: column wrap;
   justify-content: flex-end;
@@ -52,6 +70,7 @@ label .form-control {
 }
 
 .column>.tile {
+  z-index: 2000;
   margin: 0 auto;
   border-radius: 10px;
   height: 25px;
@@ -60,9 +79,12 @@ label .form-control {
 }
 
 .column>.tile.active {
-  position: absolute;
-  top: 0px;
+  z-index: 1000;
   align-self: center;
+  position: absolute;
+  margin-top: -25px;
+  top: initial;
+/*  top: 25px;*/
 }
 
 .column-container>.tile-base {

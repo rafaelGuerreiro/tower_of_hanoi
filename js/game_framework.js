@@ -111,9 +111,10 @@
     var node = that.node;
 
     events.each(function() {
-      node.addEventListener(this, function(event) {
-        invocationType.call(that, event, selector, callback);
-      });
+      if (node instanceof Node)
+        node.addEventListener(this, function(event) {
+          invocationType.call(that, event, selector, callback);
+        });
     });
 
     return this;
@@ -795,6 +796,36 @@
     });
   }
 
+  function _focus() {
+    if (this instanceof GameNode) {
+      this.node.focus();
+      return this;
+    }
+
+    if (this.length > 0)
+      this[0].focus();
+
+    return this;
+  }
+
+  function _attr(attr, value) {
+    if (this instanceof GameNode) {
+      if (value === false) {
+        this.node.removeAttribute(attr);
+      } else {
+        if (value === true)
+          value = attr;
+
+        this.node.setAttribute(attr, value);
+      }
+      return this;
+    }
+
+    return this.each(function() {
+      this.attr(attr, value);
+    });
+  }
+
   // Classes
   function GameNodes(nodes) {
     var elements = _toNodesList(nodes);
@@ -834,6 +865,9 @@
     this.setInnerHtml = _setInnerHtml;
     this.setInnerText = _setInnerText;
 
+    this.focus = _focus;
+    this.attr = _attr;
+
     for (var index = 0; index < elements.length; index++) {
       var el = elements[index];
       if (el instanceof GameNode)
@@ -849,6 +883,7 @@
 
     this.matches = _matches;
     this.find = _find;
+    this.live = _live;
     this.on = _on;
     this.trigger = _trigger;
     this.children = _children;
@@ -879,5 +914,8 @@
 
     this.setInnerHtml = _setInnerHtml;
     this.setInnerText = _setInnerText;
+
+    this.focus = _focus;
+    this.attr = _attr;
   }
 })(document, window);

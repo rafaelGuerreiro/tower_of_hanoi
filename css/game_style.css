@@ -17,14 +17,14 @@ label .form-control {
   font-size: 0.9em;
 }
 
-.game-main-container {
+.main-container {
   background-color: #fff;
   padding: 10px;
   border-radius: 4px;
   box-shadow: 0px 1px 2px #222;
 }
 
-.game-container {
+.game-container>.game-board {
   display: flex;
   flex-wrap: nowrap;
   justify-content: space-between;
@@ -32,7 +32,7 @@ label .form-control {
   height: 290px;
 }
 
-.game-container>.column-container {
+.game-container>.game-board>.column-container {
   display: flex;
   flex-flow: column wrap;
   justify-content: flex-end;
@@ -178,7 +178,7 @@ label .form-control {
     width: 100%;
   }
 
-  .game-main-container {
+  .main-container {
     border-radius: 0px;
     box-shadow: none;
   }

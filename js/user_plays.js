@@ -1,21 +1,20 @@
 ;(function($, document, window, undefined) {
   'use strict';
 
-  $(document).on('keypress', _addShortcutsToTiles);
-  $('.game-container').live('click', '.column-container', _selectTile);
-
-  var userInputsEnabled = true;
-
   $.user = {
-    enableUserInputs: _enableUserInputs,
-    disableUserInputs: _disableUserInputs
+    register: _register
   }
 
   // functions
-  function _addShortcutsToTiles(event) {
-    if (!userInputsEnabled)
+  function _register(game) {
+    if (game.player.type !== 'human')
       return;
 
+    game.root.live('click', '.column-container', _selectTile(game.player));
+    // $(document).on('keypress', _addShortcutsToTiles);
+  }
+
+  function _addShortcutsToTiles(event) {
     var number = String.fromCharCode(event.which);
 
     if (!number.match(/^[1-3]$/g))
@@ -25,19 +24,10 @@
     $('.game-container .column').get(index).trigger('click');
   }
 
-  function _selectTile() {
-    if (!userInputsEnabled)
-      return;
-
-    var index = this.find('.column').get(0).data('column');
-    $.game.selectTile(index);
-  }
-
-  function _enableUserInputs() {
-    userInputsEnabled = true;
-  }
-
-  function _disableUserInputs() {
-    userInputsEnabled = false;
+  function _selectTile(player) {
+    return function() {
+      var index = this.find('.column').get(0).data('column');
+      $.game.selectTile(player.id, index);
+    };
   }
 })($, document, window);

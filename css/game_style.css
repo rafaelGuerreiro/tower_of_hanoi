@@ -86,6 +86,10 @@ label .form-control {
   top: initial;
 }
 
+.column>.tile.active.animating {
+  z-index: 3000;
+}
+
 .column-container>.tile-base {
   display: block;
   width: 100%;

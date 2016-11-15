@@ -158,7 +158,7 @@
       return;
 
     var activeTile = definition.board[index][0];
-    tile.addClass('active');
+    tile.addClass('active animating');
 
     _animate(definition, activeTile, { top: 25 }, function() {
       definition.activeTile = activeTile;
@@ -169,11 +169,12 @@
     var tile = definition.activeTile.nodes.tile;
     var column = definition.activeTile.nodes.column;
 
-    var style = _calculateRelativePosition(tile, column, 'top');
-    console.log(style);
+    var style ={
+      top: _calculateRelativePosition(tile, column, 'top')
+    };
 
     _animate(definition, definition.activeTile, style, function() {
-      tile.removeClass('active').removeStyle('top');
+      tile.removeClass('active animating').removeStyle('top');
       definition.activeTile = null;
     });
   }
@@ -200,7 +201,7 @@
       var tile = activeTile.nodes.tile;
       column.prepend(tile.removeStyle('left'));
 
-      tile.removeClass('active').removeStyle('top');
+      tile.removeClass('active animating').removeStyle('top');
       definition.activeTile = null;
 
       // _queueFirst(definition, index);
@@ -210,17 +211,14 @@
   function _calculateRelativePosition(tile, column, position, sizing) {
     var center = 0;
     if (typeof sizing === 'string') {
-      var half = tile.getBoundingClientRect()[sizing] / 2;
-      center = (column.getBoundingClientRect()[sizing] / 2) - half;
+      var half = tile.getBoundingClientRect(sizing) / 2;
+      center = (column.getBoundingClientRect(sizing) / 2) - half;
     }
 
-    var col = column.getBoundingClientRect()[position];
-    var board = column.closest('.game-board').get(0).getBoundingClientRect()[position];
+    var col = column.getBoundingClientRect(position);
+    var tileContainer = tile.closest('.column-container').get(0).getBoundingClientRect(position);
 
-    var obj = {};
-
-    obj[position] = col - board + center;
-    return obj;
+    return col - tileContainer + center;
   }
 
   function _animate(definition, tileDefinition, style, callback) {
@@ -233,9 +231,12 @@
     var times = 0;
 
     var tile = tileDefinition.nodes.tile;
+    var columnContainer = tile.closest('.column-container').get(0);
 
     var keys = Object.keys(style).each(function() {
-      initial[this] = _asNumber(tile.getBoundingClientRect()[this]);
+      initial[this] = tile.getBoundingClientRect(this) - columnContainer.getBoundingClientRect(this);
+      initial[this] += _asNumber(tile.style('margin-' + this));
+
       actual[this] = initial[this];
 
       steps[this] = _asNumber(style[this]) - _asNumber(initial[this]);
@@ -268,7 +269,7 @@
         clearInterval(interval);
         _animationCallback(definition, callback);
       }
-    }, 10);
+    }, 2.5);
   }
 
   function _animationCallback(definition, callback) {

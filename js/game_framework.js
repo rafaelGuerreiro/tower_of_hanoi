@@ -861,12 +861,17 @@
     });
   }
 
-  function _getBoundingClientRect() {
-    if (this instanceof GameNode)
-      return this.node.getBoundingClientRect();
+  function _getBoundingClientRect(property) {
+    if (this instanceof GameNode) {
+      var rect = this.node.getBoundingClientRect();
+      if (_isStringPresent(property))
+        return rect[property];
+
+      return rect;
+    }
 
     return this.map(function() {
-      return this.getBoundingClientRect();
+      return this.getBoundingClientRect(property);
     });
   }
 

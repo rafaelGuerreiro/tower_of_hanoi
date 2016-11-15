@@ -31,6 +31,8 @@
 
   // functions
   function _initGame() {
+    var successfullyInitGame = true;
+
     $container.find('.player-setup').each(function() {
       var setup = this;
       var player = {};
@@ -40,21 +42,44 @@
       player.tiles = this.find('.tiles-amount').get(0).val();
       player.type = this.find('.player-type').get(0).val();
 
+      var areShortcutsValid = true;
       var shortcuts = false;
       if (player.type === 'human') {
         shortcuts = [
-          this.find('.shortcut-0').get(0).val(),
-          this.find('.shortcut-1').get(0).val(),
-          this.find('.shortcut-2').get(0).val()
+          _extractFirst(this.find('.shortcut-0').get(0).val()),
+          _extractFirst(this.find('.shortcut-1').get(0).val()),
+          _extractFirst(this.find('.shortcut-2').get(0).val())
         ];
-      }
-      player.shortcuts = shortcuts;
 
-      $.game.addPlayer(player);
+        areShortcutsValid = _validateShortcuts(shortcuts, this.find('.shortcut'));
+      }
+
+      if (areShortcutsValid) {
+        player.shortcuts = shortcuts;
+        $.game.addPlayer(player);
+      } else {
+        successfullyInitGame = false;
+        return false;
+      }
     });
 
-    $setup.addClass('hide');
-    $('.game-main-container').removeClass('hide');
+    if (successfullyInitGame) {
+      $setup.addClass('hide');
+      $('.game-main-container').removeClass('hide');
+    }
+  }
+
+  function _validateShortcuts(shortcuts, $input) {
+    // TODO validate shortcut
+    // TODO highlight shortcuts inputs in red.
+    return true;
+  }
+
+  function _extractFirst(value) {
+    if (!$.isStringPresent(value))
+      return '';
+
+    return value.trim().substring(0, 1);
   }
 
   function _createNewSetupConfigurationBox(options) {
@@ -128,7 +153,7 @@
     ['First', 'Second', 'Third'].each(function(index) {
       setupBox.push('<label class="shortcut-definition col-xs-4">');
       setupBox.push(this);
-      setupBox.push(' column<input type="text" maxlength="1" class="form-control shortcut-' + index + '" data-column="');
+      setupBox.push(' column<input type="text" maxlength="1" class="form-control shortcut shortcut-' + index + '" data-column="');
       setupBox.push(index);
       setupBox.push('" value="');
       setupBox.push(options.shortcuts[index]);

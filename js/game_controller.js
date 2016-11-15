@@ -160,14 +160,20 @@
     var activeTile = definition.board[index][0];
     tile.addClass('active');
 
-    _animate(definition, activeTile, { top: 0 }, function() {
+    _animate(definition, activeTile, { top: 25 }, function() {
       definition.activeTile = activeTile;
     });
   }
 
   function _unselectTile(definition) {
-    _animate(definition, definition.activeTile, { top: 'initial' }, function() {
-      definition.activeTile.nodes.tile.removeClass('active');
+    var tile = definition.activeTile.nodes.tile;
+    var column = definition.activeTile.nodes.column;
+
+    var style = _calculateRelativePosition(tile, column, 'top');
+    console.log(style);
+
+    _animate(definition, definition.activeTile, style, function() {
+      tile.removeClass('active').removeStyle('top');
       definition.activeTile = null;
     });
   }
@@ -177,49 +183,110 @@
       return;
 
     var activeTile = definition.activeTile;
+    var tile = activeTile.nodes.tile;
 
-    // TODO think about left;
-    _animate(definition, definition.activeTile, { left: 200 }, function() {
+    var style = {
+      left: _calculateRelativePosition(tile, column, 'left', 'width'),
+      top: _calculateRelativePosition(tile, column, 'top')
+    };
+
+    _animate(definition, definition.activeTile, style, function() {
       definition.board[activeTile.column].remove(activeTile);
       definition.board[index].splice(0, 0, activeTile);
 
       activeTile.column = index;
       activeTile.nodes.column = column;
 
-      column.prepend(activeTile.nodes.tile);
+      var tile = activeTile.nodes.tile;
+      column.prepend(tile.removeStyle('left'));
 
-      _queueFirst(definition, index);
+      tile.removeClass('active').removeStyle('top');
+      definition.activeTile = null;
+
+      // _queueFirst(definition, index);
     });
+  }
+
+  function _calculateRelativePosition(tile, column, position, sizing) {
+    var center = 0;
+    if (typeof sizing === 'string') {
+      var half = tile.getBoundingClientRect()[sizing] / 2;
+      center = (column.getBoundingClientRect()[sizing] / 2) - half;
+    }
+
+    var col = column.getBoundingClientRect()[position];
+    var board = column.closest('.game-board').get(0).getBoundingClientRect()[position];
+
+    var obj = {};
+
+    obj[position] = col - board + center;
+    return obj;
   }
 
   function _animate(definition, tileDefinition, style, callback) {
     definition.animating = true;
 
     var initial = {};
+    var actual = {};
     var steps = {};
 
-    Object.keys(style).each(function() {
-      console.log(tileDefinition);
+    var times = 0;
 
-      initial[this] = tileDefinition.nodes.tile.style(this);
+    var tile = tileDefinition.nodes.tile;
 
-      console.log(initial);
+    var keys = Object.keys(style).each(function() {
+      initial[this] = _asNumber(tile.getBoundingClientRect()[this]);
+      actual[this] = initial[this];
 
-      // steps[this] = initial[this] - style[this];
+      steps[this] = _asNumber(style[this]) - _asNumber(initial[this]);
+
+      times += Math.abs(steps[this]);
+    });
+
+    times = Math.floor(times / keys.length);
+    if (times > 25) times = 25;
+
+    keys.each(function() {
+      steps[this] = steps[this] / times;
     });
 
     var interval = setInterval(function() {
+      var isDone = false;
 
-      _animationCallback();
+      keys.each(function() {
+        var step = steps[this];
+
+        actual[this] += step;
+        tile.style(this, actual[this]);
+
+        isDone = isDone ||
+          (step > 0 && style[this] <= actual[this]) ||
+          (step < 0 && style[this] >= actual[this]);
+      });
+
+      if (isDone) {
+        clearInterval(interval);
+        _animationCallback(definition, callback);
+      }
     }, 10);
+  }
 
-    function _animationCallback() {
-      if (typeof callback === 'function')
-        callback();
+  function _animationCallback(definition, callback) {
+    if (typeof callback === 'function')
+      callback();
 
-      definition.animating = false;
-      _invokeNext(definition);
-    }
+    definition.animating = false;
+    _invokeNext(definition);
+  }
+
+  function _asNumber(number) {
+    if (!isNaN(number))
+      return Number(number);
+
+    if (typeof number === 'string')
+      return _asNumber(number.replace(/[^\d|\.]/gi, ''));
+
+    return 0;
   }
 
   function _invokeNext(definition) {

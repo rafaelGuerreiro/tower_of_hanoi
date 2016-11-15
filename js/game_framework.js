@@ -850,6 +850,26 @@
     }
   }
 
+  function _removeStyle(name) {
+    if (this instanceof GameNode) {
+      this.node.style[name] = '';
+      return this;
+    }
+
+    return this.each(function() {
+      this.removeStyle(name);
+    });
+  }
+
+  function _getBoundingClientRect() {
+    if (this instanceof GameNode)
+      return this.node.getBoundingClientRect();
+
+    return this.map(function() {
+      return this.getBoundingClientRect();
+    });
+  }
+
   // Classes
   function GameNodes(nodes) {
     var elements = _toNodesList(nodes);
@@ -892,6 +912,9 @@
     this.focus = _focus;
     this.attr = _attr;
     this.style = _style;
+    this.removeStyle = _removeStyle;
+
+    this.getBoundingClientRect = _getBoundingClientRect;
 
     for (var index = 0; index < elements.length; index++) {
       var el = elements[index];
@@ -943,5 +966,8 @@
     this.focus = _focus;
     this.attr = _attr;
     this.style = _style;
+    this.removeStyle = _removeStyle;
+
+    this.getBoundingClientRect = _getBoundingClientRect;
   }
 })(document, window);

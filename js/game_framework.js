@@ -259,7 +259,8 @@
       this.node.msMatchesSelector ||
       this.node.oMatchesSelector);
 
-    return fn.call(this.node, selector);
+    if (fn)
+      return fn.call(this.node, selector);
   }
 
   function _flatten() {

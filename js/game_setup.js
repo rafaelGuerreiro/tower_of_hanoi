@@ -51,7 +51,7 @@
           _extractFirst(this.find('.shortcut-2').get(0).val())
         ];
 
-        areShortcutsValid = _validateShortcuts(shortcuts, this.find('.shortcut'));
+        areShortcutsValid = _validateShortcuts(player.id, shortcuts, this.find('.shortcut'));
       }
 
       if (areShortcutsValid) {
@@ -70,7 +70,7 @@
     }
   }
 
-  function _validateShortcuts(shortcuts, $input) {
+  function _validateShortcuts(id, shortcuts, $input) {
     // TODO validate shortcut
     // TODO highlight shortcuts inputs in red.
     return true;

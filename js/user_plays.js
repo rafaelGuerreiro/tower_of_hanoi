@@ -1,6 +1,8 @@
 ;(function($, document, window, undefined) {
   'use strict';
 
+  var shortcuts = null;
+
   $.user = {
     register: _register
   }
@@ -11,17 +13,43 @@
       return;
 
     definition.root.live('click', '.column-container', _selectTile(definition));
-    // $(document).on('keypress', _addShortcutsToTiles);
+    _mapShortcuts(definition);
   }
 
-  function _addShortcutsToTiles(event) {
-    var number = String.fromCharCode(event.which);
+  function _mapShortcuts(definition) {
+    if (shortcuts === null) {
+      shortcuts = {};
+      $(document).on('keypress', _triggerShortcut);
+    }
 
-    if (!number.match(/^[1-3]$/g))
+    definition.player.shortcuts.each(function(index) {
+      var key = _asKey(this);
+
+      console.log(key);
+
+      shortcuts[key] = definition.root.find('.column').get(index);
+    });
+
+    console.log(shortcuts);
+  }
+
+  function _asKey(value) {
+    return '_' + value.substring(0, 1).toLowerCase().replace(/[^0-9a-zA-Z]/gi, '$');
+  }
+
+  function _triggerShortcut(event) {
+    if (shortcuts === null)
       return;
 
-    var index = parseInt(number, 10) - 1;
-    $('.game-container .column').get(index).trigger('click');
+    var key = _asKey(String.fromCharCode(event.which));
+
+    console.log(key);
+
+    if (Object.keys(shortcuts).indexOf(key) === -1)
+      return;
+
+    console.log(shortcuts[key]);
+    shortcuts[key].trigger('click');
   }
 
   function _selectTile(definition) {

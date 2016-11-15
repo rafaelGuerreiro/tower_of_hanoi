@@ -1,8 +1,6 @@
 ;(function($, document, window, undefined) {
   'use strict';
 
-  var MAX_TILES = 9;
-
   var playerDefinitions = {};
 
   $.game = {
@@ -15,8 +13,6 @@
   // TODO button to start and stop the game (space bar shortcut)
   // TODO score
   // TODO timer
-  // TODO add labels below the game to let users know what to do
-  // TODO add more than one player for multiplayer support
   // TODO 3 methods of computer: easy, medium and hard
 
   (function init() {
@@ -24,9 +20,6 @@
 
   // functions
   function _addPlayer(player) {
-    // {id: 0, name: "sf", shortcuts: Array[3], tiles: "3", type: "human" }
-    // {id: 1, name: "sdf", tiles: "3", type: "easy", shortcuts: false}
-
     _initialize(player);
   }
 
@@ -41,7 +34,6 @@
     var root = definition.root;
     var board = definition.board;
 
-    // use id
     root.find('.tile').each(function(index) {
       var column = this.parent();
       var columnIndex = column.data('column');

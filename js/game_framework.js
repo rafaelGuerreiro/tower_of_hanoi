@@ -808,6 +808,18 @@
     return this;
   }
 
+  function _blur() {
+    if (this instanceof GameNode) {
+      this.node.blur();
+      return this;
+    }
+
+    if (this.length > 0)
+      this[0].focus();
+
+    return this;
+  }
+
   function _attr(attr, value) {
     if (this instanceof GameNode) {
       if (value === false) {
@@ -915,6 +927,7 @@
     this.setInnerText = _setInnerText;
 
     this.focus = _focus;
+    this.blur = _blur;
     this.attr = _attr;
     this.style = _style;
     this.removeStyle = _removeStyle;
@@ -969,6 +982,7 @@
     this.setInnerText = _setInnerText;
 
     this.focus = _focus;
+    this.blur = _blur;
     this.attr = _attr;
     this.style = _style;
     this.removeStyle = _removeStyle;

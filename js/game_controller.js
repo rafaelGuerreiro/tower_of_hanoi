@@ -23,6 +23,8 @@
 
   // functions
   function _togglePlay() {
+    this.blur();
+
     var isPlay = this.hasClass('play');
 
     this.toggleClass('play pause btn-success btn-warning');

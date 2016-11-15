@@ -32,7 +32,7 @@ label .form-control {
   padding: 0 10px;
 }
 
-.game-board-container+.game-board-container {
+.game-board-container {
   border: 0;
   border-top: 1px solid #ccc;
   margin-top: 10px;
@@ -41,6 +41,10 @@ label .form-control {
 .game-board-container>h3 {
   margin: 0;
 }
+
+.play-controller>span { display: none; }
+.play-controller.play>.play { display: inline; }
+.play-controller.pause>.pause { display: inline; }
 
 .game-board {
   display: flex;

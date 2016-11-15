@@ -3,6 +3,8 @@
 
   var playerDefinitions = {};
 
+  var isPlayEnabled = false;
+
   $.game = {
     addPlayer: _addPlayer,
     selectTile: _selectTile
@@ -16,9 +18,17 @@
   // TODO 3 methods of computer: easy, medium and hard
 
   (function init() {
+    $(document).live('click', '.play-controller', _togglePlay);
   })();
 
   // functions
+  function _togglePlay() {
+    var isPlay = this.hasClass('play');
+
+    this.toggleClass('play pause btn-success btn-warning');
+    isPlayEnabled = isPlay;
+  }
+
   function _addPlayer(player) {
     _initialize(player);
   }
@@ -113,6 +123,9 @@
   }
 
   function _selectTile(definition, index) {
+    if (!isPlayEnabled)
+      return;
+
     if (typeof index !== 'number' || index > 2 || index < 0)
       return;
 
@@ -261,7 +274,7 @@
         clearInterval(interval);
         _animationCallback(definition, callback);
       }
-    }, 2.5);
+    }, 2);
   }
 
   function _animationCallback(definition, callback) {

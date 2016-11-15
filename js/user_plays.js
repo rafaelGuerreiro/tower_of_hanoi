@@ -4,10 +4,19 @@
   var shortcuts = null;
 
   $.user = {
+    initialize: _initialize,
     register: _register
-  }
+  };
 
   // functions
+  function _initialize() {
+    if (shortcuts !== null)
+      return;
+
+    shortcuts = { '__': $('.play-controller').get(0) };
+    $(document).on('keyup', _triggerShortcut);
+  }
+
   function _register(definition) {
     if (definition.player.type !== 'human')
       return;
@@ -17,23 +26,18 @@
   }
 
   function _mapShortcuts(definition) {
-    if (shortcuts === null) {
-      shortcuts = {};
-      $(document).on('keypress', _triggerShortcut);
-    }
+    _initialize();
 
     definition.player.shortcuts.each(function(index) {
       var key = _asKey(this);
-
-      console.log(key);
-
       shortcuts[key] = definition.root.find('.column').get(index);
     });
-
-    console.log(shortcuts);
   }
 
   function _asKey(value) {
+    if (value === ' ')
+      return '__';
+
     return '_' + value.substring(0, 1).toLowerCase().replace(/[^0-9a-zA-Z]/gi, '$');
   }
 
@@ -41,14 +45,12 @@
     if (shortcuts === null)
       return;
 
-    var key = _asKey(String.fromCharCode(event.which));
-
-    console.log(key);
+    var character = String.fromCharCode(event.which);
+    var key = _asKey(character);
 
     if (Object.keys(shortcuts).indexOf(key) === -1)
       return;
 
-    console.log(shortcuts[key]);
     shortcuts[key].trigger('click');
   }
 

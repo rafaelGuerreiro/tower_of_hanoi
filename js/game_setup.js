@@ -64,6 +64,7 @@
     });
 
     if (successfullyInitGame) {
+      $.user.initialize();
       $setup.addClass('hide');
       $('.game-main-container').removeClass('hide');
     }

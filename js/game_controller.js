@@ -86,6 +86,8 @@
 
     if (player.type === 'human')
       $.user.register(definition);
+    else
+      $.computer.register(definition);
 
     playerDefinitions[player.id] = definition;
   }

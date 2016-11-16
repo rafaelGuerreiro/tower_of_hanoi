@@ -16,6 +16,8 @@
   $.isFunction = _isFunction;
   $.argumentsAsArray = _argumentsAsArray;
 
+  $.log = _log;
+
   window.$ = $;
 
   var $body = new GameNode(document.body);
@@ -38,6 +40,11 @@
       return $body.find(parent).find(selector);
 
     return $body.find(selector);
+  }
+
+  function _log(message) {
+    if (console && typeof console.log === 'function')
+      console.log(message);
   }
 
   // Helper functions

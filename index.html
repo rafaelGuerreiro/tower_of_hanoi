@@ -12,7 +12,7 @@
   <body>
     <header class="centred-container">
       <div class="developed-by">
-        Developed by <strong class="developers-name">Rafael Rubem Rossi Souza Guerreiro.</strong>
+        Developed by <strong class="developers-name">Rafael Rubem Rossi Souza Guerreiro</strong>.
       </div>
     </header>
 
@@ -25,11 +25,22 @@
         </button>
       </section>
       <section class="game-main-container hide">
-        <div class="game-controller-container clearfix">
-          <button class="btn btn-success btn-block btn-lg play-controller play">
-            <span class="play"><span class="glyphicon glyphicon-play"></span> (Play or press spacebar)</span>
-            <span class="pause"><span class="glyphicon glyphicon-pause"></span> (Pause or press spacebar)</span>
-          </button>
+        <div class="game-controller-container row">
+          <div class="col-xs-8">
+            <button class="btn btn-success btn-block play-controller play">
+              <span class="play">
+                <span class="glyphicon glyphicon-play"></span>
+                <span class="hidden-xs">(Play or press spacebar)</span>
+              </span>
+              <span class="pause">
+                <span class="glyphicon glyphicon-pause"></span>
+                <span class="hidden-xs">(Pause or press spacebar)</span>
+              </span>
+            </button>
+          </div>
+          <div class="col-xs-4">
+            <div class="timer">00:00</div>
+          </div>
         </div>
         <div class="game-container">
         </div>

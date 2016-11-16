@@ -7,7 +7,15 @@
 
   $.game = {
     addPlayer: _addPlayer,
-    selectTile: _selectTile
+    selectTile: _selectTile,
+    listen: _listen
+  };
+
+  var events = {
+    play: [],
+    pause: [],
+    move: [ _didWin ],
+    win: []
   };
 
   var $container = $('.game-container');
@@ -29,6 +37,9 @@
 
     this.toggleClass('play pause btn-success btn-warning');
     isPlayEnabled = isPlay;
+
+    if (isPlay) _trigger('play');
+    else _trigger('pause');
   }
 
   function _addPlayer(player) {
@@ -81,9 +92,10 @@
 
   function _buildGameSetup(player) {
     var gameSetup = [
-      '<div class="game-board-container"><h3>',
+      '<div class="game-board-container"><div class="row">',
+      '<h3 class="col-xs-8">',
       _htmlSafe(player.name),
-      '</h3>',
+      '</h3><div class="col-xs-4 score">0</div></div>',
       '<div class="game-board" data-id="',
       player.id,
       '">'
@@ -211,7 +223,7 @@
       tile.removeClass('active animating').removeStyle('top');
       definition.activeTile = null;
 
-      // _queueFirst(definition, index);
+      _trigger('move', definition);
     });
   }
 
@@ -311,5 +323,45 @@
       return true;
 
     return definition.activeTile.tile < column[0].tile;
+  }
+
+  function _listen(name, fn) {
+    if (!$.isStringPresent(name) || typeof fn !== 'function')
+      return $.game;
+
+    if (Object.keys(events).indexOf(name) < 0)
+      return $.game;
+
+    events[name].push(fn);
+    return $.game;
+  }
+
+  function _trigger(name) {
+    if (!$.isStringPresent(name))
+      return $.game;
+
+    if (Object.keys(events).indexOf(name) < 0)
+      return $.game;
+
+    var args = Array.prototype.slice.call(arguments, 1);
+    events[name].each(function() {
+      try {
+        return this.apply(window, args)
+      } catch(e) {
+        // silence the error.
+        // this is to enable the execution of other callbacks.
+        $.log(e);
+      }
+    });
+    return $.game;
+  }
+
+  function _didWin(definition) {
+    if (definition.board[2].length !== definition.player.tiles)
+      return;
+
+    $('.play-controller').trigger('click').attr('disabled', true);
+    console.log(definition.player.name + " won!");
+    return false;
   }
 })($, document, window);

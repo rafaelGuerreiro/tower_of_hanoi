@@ -22,7 +22,6 @@
 
   // TODO button to start and stop the game (space bar shortcut)
   // TODO score
-  // TODO timer
   // TODO 3 methods of computer: easy, medium and hard
 
   (function init() {
@@ -33,13 +32,18 @@
   function _togglePlay() {
     this.blur();
 
+    if (this.matches('[disabled="disabled"]'))
+      return;
+
     var isPlay = this.hasClass('play');
 
     this.toggleClass('play pause btn-success btn-warning');
     isPlayEnabled = isPlay;
 
-    if (isPlay) _trigger('play');
-    else _trigger('pause');
+    if (isPlay)
+      _trigger('play');
+    else
+      _trigger('pause');
   }
 
   function _addPlayer(player) {
@@ -138,42 +142,42 @@
     return container.innerHTML;
   }
 
-  function _selectTile(definition, index) {
+  function _selectTile(definition, index, callback) {
     if (!isPlayEnabled)
       return;
 
     if (typeof index !== 'number' || index > 2 || index < 0)
       return;
 
-    _queue(definition, index);
+    _queue(definition, index, callback);
   }
 
-  function _queueFirst(definition, index) {
+  function _queueFirst(definition, index, callback) {
     if (definition.animating)
-      definition.queue.splice(0, 0, index);
+      definition.queue.splice(0, 0, { index: index, callback: callback });
     else
-      _invokeAction(definition, index);
+      _invokeAction(definition, index, callback);
   }
 
-  function _queue(definition, index) {
+  function _queue(definition, index, callback) {
     if (definition.animating)
-      definition.queue.push(index);
+      definition.queue.push({ index: index, callback: callback });
     else
-      _invokeAction(definition, index);
+      _invokeAction(definition, index, callback);
   }
 
-  function _invokeAction(definition, index) {
+  function _invokeAction(definition, index, callback) {
     var column = definition.root.find('.column').get(index);
 
     if (!definition.activeTile)
-      _activateTile(definition, column, index);
+      _activateTile(definition, column, index, callback);
     else if (definition.activeTile.column === index)
-      _unselectTile(definition);
+      _unselectTile(definition, callback);
     else
-      _moveTileTo(definition, column, index);
+      _moveTileTo(definition, column, index, callback);
   }
 
-  function _activateTile(definition, column, index) {
+  function _activateTile(definition, column, index, callback) {
     var tile = column.find('.tile').get(0);
     if (!tile)
       return;
@@ -183,10 +187,10 @@
 
     _animate(definition, activeTile, { top: 25 }, function() {
       definition.activeTile = activeTile;
-    });
+    }, callback);
   }
 
-  function _unselectTile(definition) {
+  function _unselectTile(definition, callback) {
     var tile = definition.activeTile.nodes.tile;
     var column = definition.activeTile.nodes.column;
 
@@ -197,10 +201,10 @@
     _animate(definition, definition.activeTile, style, function() {
       tile.removeClass('active animating').removeStyle('top');
       definition.activeTile = null;
-    });
+    }, callback);
   }
 
-  function _moveTileTo(definition, column, index) {
+  function _moveTileTo(definition, column, index, callback) {
     if (!_isAbleToMove(definition, index))
       return;
 
@@ -226,7 +230,7 @@
       definition.activeTile = null;
 
       _trigger('move', definition);
-    });
+    }, callback);
   }
 
   function _calculateRelativePosition(tile, column, position, sizing) {
@@ -242,7 +246,7 @@
     return col - tileContainer + center;
   }
 
-  function _animate(definition, tileDefinition, style, callback) {
+  function _animate(definition, tileDefinition, style) {
     definition.animating = true;
 
     var initial = {};
@@ -272,6 +276,8 @@
       steps[this] = steps[this] / times;
     });
 
+    var callbacks = Array.prototype.slice.call(arguments, 3);
+
     var interval = setInterval(function() {
       var isDone = false;
 
@@ -288,16 +294,21 @@
 
       if (isDone) {
         clearInterval(interval);
-        _animationCallback(definition, callback);
+        _animationCallback(definition, callbacks);
       }
     }, 2);
   }
 
-  function _animationCallback(definition, callback) {
-    if (typeof callback === 'function')
-      callback();
-
+  function _animationCallback(definition, callbacks) {
     definition.animating = false;
+
+    if (Array.isArray(callbacks))
+      for (var index = 0; index < callbacks.length; index++) {
+        var callback = callbacks[index];
+        if (typeof callback === 'function')
+          callback(definition);
+      }
+
     _invokeNext(definition);
   }
 
@@ -315,7 +326,9 @@
     if (definition.queue.length === 0)
       return;
 
-    _invokeAction(definition, definition.queue.shift());
+    var action = definition.queue.shift();
+
+    _invokeAction(definition, action.index, action.callback);
   }
 
   function _isAbleToMove(definition, index) {

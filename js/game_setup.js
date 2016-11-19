@@ -137,7 +137,8 @@
       { id: 'human', text: 'Human', hasShortcut: true },
       { id: 'easy', text: 'Computer (easy)', hasShortcut: false },
       { id: 'medium', text: 'Computer (medium)', hasShortcut: false },
-      { id: 'hard', text: 'Computer (hard)', hasShortcut: false }
+      { id: 'hard', text: 'Computer (hard)', hasShortcut: false },
+      { id: 'impossible', text: 'Computer (impossible)', hasShortcut: false }
     ].each(function() {
       setupBox.push('<option value="');
       setupBox.push(this.id);

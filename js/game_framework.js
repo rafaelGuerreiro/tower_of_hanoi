@@ -770,7 +770,7 @@
       if (!_isStringPresent(text))
         text = '';
 
-      this.node.innerText = text;
+      this.node.innerText = '' + text;
       return this;
     }
 

@@ -195,7 +195,7 @@ label .form-control {
 .tile.tile-8 { width: 85%; background-color: OliveDrab; }
 .tile.tile-9 { width: 95%; background-color: OrangeRed; }
 
-.timer, .score {
+.timer, .moves {
   font-weight: bold;
   font-size: 1.5em;
   text-align: right;

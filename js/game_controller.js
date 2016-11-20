@@ -20,9 +20,8 @@
 
   var $container = $('.game-container');
 
-  // TODO button to start and stop the game (space bar shortcut)
-  // TODO score
-  // TODO 3 methods of computer: easy, medium and hard
+  // TODO moves
+  // TODO exit game
 
   (function init() {
     $(document).live('click', '.play-controller', _togglePlay);
@@ -85,7 +84,7 @@
       activeTile: null,
       queue: [],
       animating: false,
-      root: $('.game-container').find('.game-board[data-id="' + player.id + '"]').get(0)
+      root: $('.game-container').find('.game-board[data-id="' + player.id + '"]').closest('.game-board-container').get(0)
     };
 
     if (player.type === 'human')
@@ -101,7 +100,7 @@
       '<div class="game-board-container"><div class="row">',
       '<h3 class="col-xs-8">',
       _htmlSafe(player.name),
-      '</h3><div class="col-xs-4 score">0</div></div>',
+      '</h3><div class="col-xs-4 moves">Moves: <span class="moves-counter">0</span></div></div>',
       '<div class="game-board" data-id="',
       player.id,
       '">'
@@ -377,6 +376,5 @@
 
     $('.play-controller').trigger('click').attr('disabled', true);
     console.log(definition.player.name + " won!");
-    return false;
   }
 })($, document, window);

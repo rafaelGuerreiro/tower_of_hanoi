@@ -1,9 +1,17 @@
 ;(function($, document, window, undefined) {
   'use strict';
 
+  $.movement = {
+    quit: _quit
+  };
+
   (function initialize() {
     $.game.listen('move', _countMove);
   })();
+
+  function _quit() {
+    $('.moves-counter').setInnerText('0');
+  }
 
   function _countMove(definition) {
     if (definition.move === undefined)

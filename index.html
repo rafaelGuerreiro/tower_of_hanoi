@@ -29,16 +29,22 @@
       </section>
       <section class="game-main-container hide">
         <div class="game-controller-container row">
-          <div class="col-xs-8">
+          <div class="col-xs-4">
             <button class="btn btn-success btn-block play-controller play">
               <span class="play">
                 <span class="glyphicon glyphicon-play"></span>
-                <span class="hidden-xs">(Play or press spacebar)</span>
+                <span class="hidden-xs">Play (press spacebar)</span>
               </span>
               <span class="pause">
                 <span class="glyphicon glyphicon-pause"></span>
-                <span class="hidden-xs">(Pause or press spacebar)</span>
+                <span class="hidden-xs">Pause (press spacebar)</span>
               </span>
+            </button>
+          </div>
+          <div class="col-xs-4">
+            <button class="btn btn-danger btn-block quit">
+              <span class="glyphicon glyphicon-stop"></span>
+              <span class="hidden-xs">Quit this instance</span>
             </button>
           </div>
           <div class="col-xs-4">
@@ -54,7 +60,6 @@
     <script type="text/javascript" src="js/game_setup.js"></script>
     <script type="text/javascript" src="js/game_controller.js"></script>
     <script type="text/javascript" src="js/time.js"></script>
-    <script type="text/javascript" src="js/score.js"></script>
     <script type="text/javascript" src="js/move.js"></script>
     <script type="text/javascript" src="js/user_plays.js"></script>
     <script type="text/javascript" src="js/computer_plays.js"></script>

@@ -4,10 +4,19 @@
   var timeouts = {};
 
   $.computer = {
+    quit: _quit,
     register: _register
   };
 
   // functions
+  function _quit() {
+    Object.keys(timeouts).each(function() {
+      clearTimeout(timeouts[this]);
+    });
+
+    timeouts = {};
+  }
+
   function _register(definition) {
     definition.computer = {
       direction: definition.player.tiles % 2 === 0 ? 1 : -1,

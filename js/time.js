@@ -1,6 +1,10 @@
 ;(function($, document, window, undefined) {
   'use strict';
 
+  $.timer = {
+    quit: _quit
+  };
+
   var $timer = $('.timer').get(0);
 
   var time = 0;
@@ -14,6 +18,12 @@
   })();
 
   // functions
+  function _quit() {
+    _pause();
+    time = 0;
+    _getUpdateTimer();
+  }
+
   function _start() {
     if (interval !== null)
       return;

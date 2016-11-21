@@ -412,10 +412,10 @@
     }
 
     return this.map(function() {
-        return this.toggleClass(classes);
+        return this.hasClass(classes);
       }).reduce(function(hasClass, eachVal) {
         return hasClass && eachVal;
-      });
+      }, true);
   }
 
   function _processClassNames(classes) {

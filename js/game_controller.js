@@ -1,10 +1,7 @@
 ;(function($, document, window, undefined) {
   'use strict';
 
-  var playerDefinitions = {};
-
-  var isPlayEnabled = false;
-  var isGameOver = false;
+  var playerDefinitions, isPlayEnabled, isGameOver;
 
   $.game = {
     addPlayer: _addPlayer,
@@ -22,14 +19,38 @@
 
   var $container = $('.game-container');
 
-  // TODO pause bug
-  // TODO exit game
+  // TODO display winner
 
   (function init() {
-    $(document).live('click', '.play-controller', _togglePlay);
+    _initializeVariables();
+
+    $(document).live('click', '.play-controller', _togglePlay)
+      .live('click', '.quit', _quit);
   })();
 
   // functions
+  function _initializeVariables() {
+    playerDefinitions = {};
+
+    isPlayEnabled = false;
+    isGameOver = false;
+  }
+
+  function _quit() {
+    var playButton = $('.play-controller').attr('disabled', false);
+    playButton.hasClass('pause') && playButton.trigger('click');
+
+    $.timer.quit();
+    $.movement.quit();
+    $.computer.quit();
+
+    _initializeVariables();
+    $('.game-main-container').addClass('hide');
+    $container.setInnerHtml('');
+
+    $('.game-setup').removeClass('hide');
+  }
+
   function _togglePlay() {
     this.blur();
 

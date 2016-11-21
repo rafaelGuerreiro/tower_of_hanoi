@@ -15,7 +15,6 @@ FILES="$ROOT/js/game_framework.js
 $ROOT/js/game_setup.js
 $ROOT/js/game_controller.js
 $ROOT/js/time.js
-$ROOT/js/score.js
 $ROOT/js/move.js
 $ROOT/js/user_plays.js
 $ROOT/js/computer_plays.js"

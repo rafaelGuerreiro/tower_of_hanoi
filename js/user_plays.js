@@ -4,11 +4,16 @@
   var shortcuts = null;
 
   $.user = {
+    quit: _quit,
     initialize: _initialize,
     register: _register
   };
 
   // functions
+  function _quit() {
+    shortcuts = null;
+  }
+
   function _initialize() {
     if (shortcuts !== null)
       return;

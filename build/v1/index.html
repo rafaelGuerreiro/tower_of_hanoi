@@ -7,10 +7,10 @@
     <title>Tower of Hanoi</title>
 
     <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="css/compiled.5515428cab46fcd94664d6b7d5db5d4a.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/compiled.26f8f3e071c87c8cdcac58854ae6953c.min.css" />
 
     <!-- this sniffer is just for debugging purposes. This line should be commented. -->
-    <!-- <script type="text/javascript" src="js/interval-sniffer.js"></script> -->
+    <!-- <script type="text/javascript" src="js/development/interval-sniffer.js"></script> -->
   </head>
   <body>
     <header class="centred-container">
@@ -29,20 +29,26 @@
       </section>
       <section class="game-main-container hide">
         <div class="game-controller-container row">
-          <div class="col-xs-8">
+          <div class="col-xs-4">
             <button class="btn btn-success btn-block play-controller play">
               <span class="play">
                 <span class="glyphicon glyphicon-play"></span>
-                <span class="hidden-xs">(Play or press spacebar)</span>
+                <span class="hidden-xs">Play (press spacebar)</span>
               </span>
               <span class="pause">
                 <span class="glyphicon glyphicon-pause"></span>
-                <span class="hidden-xs">(Pause or press spacebar)</span>
+                <span class="hidden-xs">Pause (press spacebar)</span>
               </span>
             </button>
           </div>
           <div class="col-xs-4">
-            <div class="timer">00:00</div>
+            <button class="btn btn-danger btn-block quit">
+              <span class="glyphicon glyphicon-stop"></span>
+              <span class="hidden-xs">Quit this instance</span>
+            </button>
+          </div>
+          <div class="col-xs-4">
+            <div class="timer">00:00.000</div>
           </div>
         </div>
         <div class="game-container">
@@ -50,6 +56,6 @@
       </section>
     </main>
 
-    <script type="text/javascript" src="js/compiled.2b42ed2c8a6ff2eff0563f9a23dab69f.min.js"></script>
+    <script type="text/javascript" src="js/compiled.7974dc55710aa51357f1435cc0722798.min.js"></script>
   </body>
 </html>

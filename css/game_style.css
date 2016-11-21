@@ -79,7 +79,6 @@ label .form-control {
   border-radius: 10px;
   height: 25px;
   display: block;
-  box-shadow: 0px 1px 2px #222;
 }
 
 .column>.tile.active {

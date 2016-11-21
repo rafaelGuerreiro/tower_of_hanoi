@@ -4,10 +4,12 @@
   var playerDefinitions = {};
 
   var isPlayEnabled = false;
+  var isGameOver = false;
 
   $.game = {
     addPlayer: _addPlayer,
     selectTile: _selectTile,
+    atomicMoveTile: _atomicMoveTile,
     listen: _listen
   };
 
@@ -20,7 +22,7 @@
 
   var $container = $('.game-container');
 
-  // TODO moves
+  // TODO pause bug
   // TODO exit game
 
   (function init() {
@@ -145,38 +147,69 @@
     if (!isPlayEnabled)
       return;
 
-    if (typeof index !== 'number' || index > 2 || index < 0)
+    if (_isColumnInvalid(index))
       return;
 
     _queue(definition, index, callback);
   }
 
-  function _queueFirst(definition, index, callback) {
+  function _atomicMoveTile(definition, from, target, callback) {
+    if (!isPlayEnabled)
+      return;
+
+    if (_isColumnInvalid(from) || _isColumnInvalid(target))
+      return;
+
+    _queueAtomic(definition, from, target, callback);
+  }
+
+  function _isColumnInvalid(index) {
+    return typeof index !== 'number' || index > 2 || index < 0;
+  }
+
+  function _queueAtomic(definition, from, target, callback) {
+    var action = {
+      index: from,
+      invokeNext: false,
+      callback: function() {
+        _invokeAction(definition, {
+          index: target,
+          invokeNext: true,
+          callback: callback
+        });
+      }
+    };
+
     if (definition.animating)
-      definition.queue.splice(0, 0, { index: index, callback: callback });
+      definition.queue.push(action);
     else
-      _invokeAction(definition, index, callback);
+      _invokeAction(definition, action);
   }
 
   function _queue(definition, index, callback) {
+    var action = { index: index, invokeNext: true, callback: callback };
+
     if (definition.animating)
-      definition.queue.push({ index: index, callback: callback });
+      definition.queue.push(action);
     else
-      _invokeAction(definition, index, callback);
+      _invokeAction(definition, action);
   }
 
-  function _invokeAction(definition, index, callback) {
+  function _invokeAction(definition, action) {
+    var index = action.index;
+    var invokeNext = action.invokeNext;
+    var callback = action.callback;
+
     var column = definition.root.find('.column').get(index);
-
     if (!definition.activeTile)
-      _activateTile(definition, column, index, callback);
+      _activateTile(definition, column, index, invokeNext, callback);
     else if (definition.activeTile.column === index)
-      _unselectTile(definition, callback);
+      _unselectTile(definition, invokeNext, callback);
     else
-      _moveTileTo(definition, column, index, callback);
+      _moveTileTo(definition, column, index, invokeNext, callback);
   }
 
-  function _activateTile(definition, column, index, callback) {
+  function _activateTile(definition, column, index, invokeNext, callback) {
     var tile = column.find('.tile').get(0);
     if (!tile)
       return;
@@ -184,12 +217,12 @@
     var activeTile = definition.board[index][0];
     tile.addClass('active animating');
 
-    _animate(definition, activeTile, { top: 25 }, function() {
+    _animate(definition, activeTile, { top: 25 }, invokeNext, function() {
       definition.activeTile = activeTile;
     }, callback);
   }
 
-  function _unselectTile(definition, callback) {
+  function _unselectTile(definition, invokeNext, callback) {
     var tile = definition.activeTile.nodes.tile;
     var column = definition.activeTile.nodes.column;
 
@@ -197,13 +230,13 @@
       top: _calculateRelativePosition(tile, column, 'top')
     };
 
-    _animate(definition, definition.activeTile, style, function() {
+    _animate(definition, definition.activeTile, style, invokeNext, function() {
       tile.removeClass('active animating').removeStyle('top');
       definition.activeTile = null;
     }, callback);
   }
 
-  function _moveTileTo(definition, column, index, callback) {
+  function _moveTileTo(definition, column, index, invokeNext, callback) {
     if (!_isAbleToMove(definition, index))
       return;
 
@@ -215,7 +248,7 @@
       top: _calculateRelativePosition(tile, column, 'top')
     };
 
-    _animate(definition, definition.activeTile, style, function() {
+    _animate(definition, definition.activeTile, style, invokeNext, function() {
       definition.board[activeTile.column].remove(activeTile);
       definition.board[index].splice(0, 0, activeTile);
 
@@ -245,7 +278,7 @@
     return col - tileContainer + center;
   }
 
-  function _animate(definition, tileDefinition, style) {
+  function _animate(definition, tileDefinition, style, invokeNext) {
     definition.animating = true;
 
     var initial = {};
@@ -275,7 +308,7 @@
       steps[this] = steps[this] / times;
     });
 
-    var callbacks = Array.prototype.slice.call(arguments, 3);
+    var callbacks = Array.prototype.slice.call(arguments, 4);
 
     var interval = setInterval(function() {
       var isDone = false;
@@ -291,14 +324,14 @@
           (step < 0 && style[this] >= actual[this]);
       });
 
-      if (isDone) {
+      if (isDone || isGameOver) {
         clearInterval(interval);
-        _animationCallback(definition, callbacks);
+        _animationCallback(definition, callbacks, invokeNext);
       }
     }, 2);
   }
 
-  function _animationCallback(definition, callbacks) {
+  function _animationCallback(definition, callbacks, invokeNext) {
     definition.animating = false;
 
     if (Array.isArray(callbacks))
@@ -308,7 +341,8 @@
           callback(definition);
       }
 
-    _invokeNext(definition);
+    if (invokeNext)
+      _invokeNext(definition);
   }
 
   function _asNumber(number) {
@@ -326,8 +360,7 @@
       return;
 
     var action = definition.queue.shift();
-
-    _invokeAction(definition, action.index, action.callback);
+    _invokeAction(definition, action);
   }
 
   function _isAbleToMove(definition, index) {
@@ -371,10 +404,11 @@
   }
 
   function _didWin(definition) {
-    if (definition.board[2].length !== definition.player.tiles)
+    if (definition.board[2].length !== definition.player.tiles || isGameOver)
       return;
 
     $('.play-controller').trigger('click').attr('disabled', true);
     console.log(definition.player.name + " won!");
+    isGameOver = true;
   }
 })($, document, window);

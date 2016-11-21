@@ -4,7 +4,7 @@
   var $timer = $('.timer').get(0);
 
   var time = 0;
-  var steps = 1000;
+  var steps = 25;
 
   var interval = null;
 
@@ -38,14 +38,18 @@
   }
 
   function _beautify(millisecond) {
-    var second = _zeroLeft((millisecond / 1000) % 60);
-    var minute = _zeroLeft(Math.floor((millisecond / 1000) / 60));
+    var millis = _zeroLeft(3, millisecond % 1000);
+    var second = _zeroLeft(2, Math.floor(millisecond / 1000) % 60);
+    var minute = _zeroLeft(2, Math.floor((millisecond / 1000) / 60));
 
-    return [minute, second].join(':');
+    return [minute, ':', second, '.', millis].join('');
   }
 
-  function _zeroLeft(number) {
-    var padding = 2 - ("" + number).length;
+  function _zeroLeft(left, number) {
+    if ((number >= 100 && left === 3) || (number >= 10 && left === 2))
+      return number;
+
+    var padding = left - ("" + number).length;
     number = [number];
 
     for (var zero = 0; zero < padding; zero++)

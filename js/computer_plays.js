@@ -22,8 +22,15 @@
 
   function _play(definition) {
     return function() {
-      _selectTile(definition);
+      _pause(definition)();
+      _start(definition);
     };
+  }
+
+  function _start(definition) {
+    timeouts[definition.player.id] = setTimeout(function() {
+      _selectTile(definition)
+    }, definition.computer.interval);
   }
 
   function _selectTile(definition) {
@@ -33,12 +40,9 @@
     else
       _onlyAvailableMovement(definition, columns);
 
-    definition.computer.moveFirstTile = !definition.computer.moveFirstTile;
-
-    $.game.selectTile(definition, columns[0], function() {
-      $.game.selectTile(definition, columns[1]);
-
-      timeouts[definition.player.id] = setTimeout(_play(definition), definition.computer.interval);
+    $.game.atomicMoveTile(definition, columns[0], columns[1], function() {
+      definition.computer.moveFirstTile = !definition.computer.moveFirstTile;
+      _start(definition);
     });
   }
 
@@ -98,20 +102,25 @@
 
   function _pause(definition) {
     return function() {
-      clearTimeout(timeouts[definition.player.id]);
+      var id = timeouts[definition.player.id];
+
+      if (id !== undefined)
+        clearTimeout(id);
     };
   }
 
   function _calculateInterval(difficulty) {
+    var base = 125;
+
     if ('easy' === difficulty)
-      return 1500;
+      return (base * 10);
 
     if ('medium' === difficulty)
-      return 1000;
+      return (base * 6);
 
     if ('hard' === difficulty)
-      return 500;
+      return (base * 4);
 
-    return 125;
+    return base;
   }
 })($, document, window);

@@ -1,10 +1,10 @@
 #!/bin/sh
 
-TARGET="./v1"
+TARGET="./build"
 
 echo 'Compiling...'
 
-ROOT=".."
+ROOT="."
 
 for f in $TARGET/js/*.js $TARGET/css/*.css
 do
@@ -51,11 +51,12 @@ cp -f $ROOT/favicon.ico $TARGET/favicon.ico
 sed s/\{min\.js\}/"js\\/compiled\\.$JSCHECKSUM\\.min\\.js"/g template.html > "$TARGET/index_temp.html"
 sed s/\{min\.css\}/"css\\/compiled\\.$CSSCHECKSUM\\.min\\.css"/g "$TARGET/index_temp.html" > "$TARGET/index.html"
 
+rm "$TARGET/template.html"
 rm "$TARGET/index_temp.html"
 
-cp -Rf v1/ ../../cpsc1045-tower-of-hanoi
+cp -Rf $TARGET/ $ROOT/../cpsc1045-tower-of-hanoi
 
-cd ../../cpsc1045-tower-of-hanoi
+cd $ROOT/../cpsc1045-tower-of-hanoi
 git add -A
 git commit -m "Build #$JSCHECKSUM"
 

@@ -46,4 +46,13 @@ sed s/\{min\.js\}/"js\\/compiled\\.$JSCHECKSUM\\.min\\.js"/g template.html > "$T
 sed s/\{min\.css\}/"css\\/compiled\\.$CSSCHECKSUM\\.min\\.css"/g "$TARGET/index_temp.html" > "$TARGET/index.html"
 
 rm "$TARGET/index_temp.html"
+
+cp -Rf v1/ ../../cpsc1045-tower-of-hanoi
+
+cd ../../cpsc1045-tower-of-hanoi
+git add -A
+git commit -m "Build #$JSCHECKSUM"
+
+git push heroku master
+
 echo 'Compiled.'

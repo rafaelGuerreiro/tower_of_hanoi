@@ -238,7 +238,15 @@
     var activeTile = definition.board[index][0];
     tile.addClass('active animating');
 
-    _animate(definition, activeTile, { top: 25 }, invokeNext, function() {
+    var column = activeTile.nodes.column;
+
+    var style = {
+      left: _calculateRelativePosition(tile, column, 'left', 'width'),
+      top: 25
+    };
+    tile.style('left', style.left);
+
+    _animate(definition, activeTile, style, invokeNext, function() {
       definition.activeTile = activeTile;
     }, callback);
   }
@@ -247,7 +255,8 @@
     var tile = definition.activeTile.nodes.tile;
     var column = definition.activeTile.nodes.column;
 
-    var style ={
+    var style = {
+      left: _calculateRelativePosition(tile, column, 'left', 'width'),
       top: _calculateRelativePosition(tile, column, 'top')
     };
 

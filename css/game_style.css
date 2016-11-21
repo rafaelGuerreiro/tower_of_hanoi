@@ -2,7 +2,7 @@ body {
   background-color: #ddd;
 }
 
-label .form-control {
+label>.form-control {
   font-weight: normal;
 }
 
@@ -219,6 +219,14 @@ label .form-control {
   .main-container {
     border-radius: 0px;
     box-shadow: none;
+  }
+
+  .game-setup-container {
+    margin-bottom: 0;
+  }
+
+  .setup-selection-container {
+    margin-bottom: 20px;
   }
 }
 

@@ -19,6 +19,7 @@
 
   var $container = $('.game-container');
 
+  // TODO validate shortcuts
   // TODO display winner
 
   (function init() {

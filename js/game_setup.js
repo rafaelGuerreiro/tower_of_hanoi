@@ -26,6 +26,8 @@
     $container.live('change', '.player-setup input, .player-setup select', _toggleInitGame);
     $container.live('keyup', '.player-setup input', _toggleInitGameOrInitGame);
 
+    $container.live('change', '.shortcut', _validateShortcuts);
+
     $body.live('click', '.init-game', _initGame);
   })();
 
@@ -42,19 +44,15 @@
       player.tiles = this.find('.tiles-amount').get(0).val();
       player.type = this.find('.player-type').get(0).val();
 
-      var areShortcutsValid = true;
       var shortcuts = false;
-      if (player.type === 'human') {
+      if (player.type === 'human')
         shortcuts = [
           _extractFirst(this.find('.shortcut-0').get(0).val()),
           _extractFirst(this.find('.shortcut-1').get(0).val()),
           _extractFirst(this.find('.shortcut-2').get(0).val())
         ];
 
-        areShortcutsValid = _validateShortcuts(player.id, shortcuts, this.find('.shortcut'));
-      }
-
-      if (areShortcutsValid) {
+      if (this.find('.has-error').length === 0) {
         player.shortcuts = shortcuts;
         $.game.addPlayer(player);
       } else {
@@ -70,10 +68,32 @@
     }
   }
 
-  function _validateShortcuts(id, shortcuts, $input) {
-    // TODO validate shortcut
-    // TODO highlight shortcuts inputs in red.
-    return true;
+  function _validateShortcuts() {
+    var errorClass = 'has-error';
+    var shortcuts = [];
+
+    $container.find('.shortcut').each(function() {
+      this.removeClass(errorClass);
+      if (this.closest('.shortcut-definition-container').hasClass('hide'))
+        return;
+
+      shortcuts.push({
+        shortcut: this.val(),
+        element: this
+      });
+    });
+
+    shortcuts.each(function(index, array) {
+      for (var ix = 0; ix < array.length; ix++) {
+        if (ix === index)
+          continue;
+
+        if (this.shortcut === array[index].shortcut) {
+          this.element.addClass(errorClass);
+          array[index].element.addClass(errorClass);
+        }
+      }
+    });
   }
 
   function _extractFirst(value) {
@@ -153,9 +173,12 @@
     setupBox.push('<div class="shortcut-definition-container"><hr /><div class="row"><div class="col-xs-12">Shortcuts</div>');
 
     ['First', 'Second', 'Third'].each(function(index) {
-      setupBox.push('<label class="shortcut-definition col-xs-4">');
+      setupBox.push('<label class="shortcut-definition col-xs-4"><span class="control-label">');
       setupBox.push(this);
-      setupBox.push(' column<input type="text" maxlength="1" class="form-control shortcut shortcut-' + index + '" data-column="');
+      setupBox.push('<span class="hidden-sm"> column</span></span>');
+      setupBox.push('<input type="text" maxlength="1" class="form-control shortcut shortcut-');
+      setupBox.push(index);
+      setupBox.push('" data-column="');
       setupBox.push(index);
       setupBox.push('" value="');
       setupBox.push(options.shortcuts[index]);

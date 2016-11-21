@@ -30,7 +30,9 @@ mv "$TARGET/js/compiled.min.js" "$TARGET/js/compiled.$JSCHECKSUM.min.js"
 
 echo "Compiled: $TARGET/js/compiled.$JSCHECKSUM.min.js"
 
-FILES="$ROOT/css/game_style.css"
+FILES="$ROOT/bootstrap/css/bootstrap.min.css
+$ROOT/css/game_style.css"
+
 for f in $FILES
 do
   echo "Compiling CSS: ${f}"
@@ -41,6 +43,10 @@ CSSCHECKSUM=`md5 -q "$TARGET/css/compiled.min.css"`
 mv "$TARGET/css/compiled.min.css" "$TARGET/css/compiled.$CSSCHECKSUM.min.css"
 
 echo "Compiled: $TARGET/css/compiled.$CSSCHECKSUM.min.css"
+
+cp -Rf $ROOT/bootstrap/fonts/ $TARGET/fonts
+
+cp -f $ROOT/favicon.ico $TARGET/favicon.ico
 
 sed s/\{min\.js\}/"js\\/compiled\\.$JSCHECKSUM\\.min\\.js"/g template.html > "$TARGET/index_temp.html"
 sed s/\{min\.css\}/"css\\/compiled\\.$CSSCHECKSUM\\.min\\.css"/g "$TARGET/index_temp.html" > "$TARGET/index.html"

@@ -898,47 +898,6 @@
     var elements = _toNodesList(nodes);
 
     this.length = elements.length;
-    this.each = _each;
-    this.map = _map;
-    this.live = _live;
-    this.on = _on;
-    this.trigger = _trigger;
-    this.get = _get;
-    this.find = _find;
-    this.children = _children;
-    this.match = _match;
-    this.flatten = _flatten;
-    this.filter = _filter;
-    this.closest = _closest;
-
-    this.val = _val;
-
-    this.addClass = _addClass;
-    this.removeClass = _removeClass;
-    this.toggleClass = _toggleClass;
-    this.hasClass = _hasClass;
-
-    this.data = _data;
-    this.removeData = _removeData;
-    this.setData = _setData;
-
-    this.prepend = _prepend;
-    this.insertBefore = _insertBefore;
-    this.insertAfter = _insertAfter;
-    this.append = _append;
-
-    this.remove = _removeNode;
-
-    this.setInnerHtml = _setInnerHtml;
-    this.setInnerText = _setInnerText;
-
-    this.focus = _focus;
-    this.blur = _blur;
-    this.attr = _attr;
-    this.style = _style;
-    this.removeStyle = _removeStyle;
-
-    this.getBoundingClientRect = _getBoundingClientRect;
 
     for (var index = 0; index < elements.length; index++) {
       var el = elements[index];
@@ -949,50 +908,91 @@
     }
   }
 
+  GameNodes.prototype.each = _each;
+  GameNodes.prototype.map = _map;
+  GameNodes.prototype.live = _live;
+  GameNodes.prototype.on = _on;
+  GameNodes.prototype.trigger = _trigger;
+  GameNodes.prototype.get = _get;
+  GameNodes.prototype.find = _find;
+  GameNodes.prototype.children = _children;
+  GameNodes.prototype.match = _match;
+  GameNodes.prototype.flatten = _flatten;
+  GameNodes.prototype.filter = _filter;
+  GameNodes.prototype.closest = _closest;
+
+  GameNodes.prototype.val = _val;
+
+  GameNodes.prototype.addClass = _addClass;
+  GameNodes.prototype.removeClass = _removeClass;
+  GameNodes.prototype.toggleClass = _toggleClass;
+  GameNodes.prototype.hasClass = _hasClass;
+
+  GameNodes.prototype.data = _data;
+  GameNodes.prototype.removeData = _removeData;
+  GameNodes.prototype.setData = _setData;
+
+  GameNodes.prototype.prepend = _prepend;
+  GameNodes.prototype.insertBefore = _insertBefore;
+  GameNodes.prototype.insertAfter = _insertAfter;
+  GameNodes.prototype.append = _append;
+
+  GameNodes.prototype.remove = _removeNode;
+
+  GameNodes.prototype.setInnerHtml = _setInnerHtml;
+  GameNodes.prototype.setInnerText = _setInnerText;
+
+  GameNodes.prototype.focus = _focus;
+  GameNodes.prototype.blur = _blur;
+  GameNodes.prototype.attr = _attr;
+  GameNodes.prototype.style = _style;
+  GameNodes.prototype.removeStyle = _removeStyle;
+
+  GameNodes.prototype.getBoundingClientRect = _getBoundingClientRect;
+
   function GameNode(node) {
     this.node = node;
     this._data = _getDataAttributes(node);
-
-    this.matches = _matches;
-    this.find = _find;
-    this.live = _live;
-    this.on = _on;
-    this.trigger = _trigger;
-    this.children = _children;
-    this.closest = _closest;
-
-    this.val = _val;
-
     this.styleNames = _processClassNames(node.className);
-
-    this.addClass = _addClass;
-    this.removeClass = _removeClass;
-    this.toggleClass = _toggleClass;
-    this.hasClass = _hasClass;
-    this.parent = _parent;
-
-    this.data = _data;
-    this.removeData = _removeData;
-    this.setData = _setData;
-
-    this.index = _index;
-
-    this.prepend = _prepend;
-    this.insertBefore = _insertBefore;
-    this.insertAfter = _insertAfter;
-    this.append = _append;
-
-    this.remove = _removeNode;
-
-    this.setInnerHtml = _setInnerHtml;
-    this.setInnerText = _setInnerText;
-
-    this.focus = _focus;
-    this.blur = _blur;
-    this.attr = _attr;
-    this.style = _style;
-    this.removeStyle = _removeStyle;
-
-    this.getBoundingClientRect = _getBoundingClientRect;
   }
+
+  GameNode.prototype.matches = _matches;
+  GameNode.prototype.find = _find;
+  GameNode.prototype.live = _live;
+  GameNode.prototype.on = _on;
+  GameNode.prototype.trigger = _trigger;
+  GameNode.prototype.children = _children;
+  GameNode.prototype.closest = _closest;
+
+  GameNode.prototype.val = _val;
+
+  GameNode.prototype.addClass = _addClass;
+  GameNode.prototype.removeClass = _removeClass;
+  GameNode.prototype.toggleClass = _toggleClass;
+  GameNode.prototype.hasClass = _hasClass;
+  GameNode.prototype.parent = _parent;
+
+  GameNode.prototype.data = _data;
+  GameNode.prototype.removeData = _removeData;
+  GameNode.prototype.setData = _setData;
+
+  GameNode.prototype.index = _index;
+
+  GameNode.prototype.prepend = _prepend;
+  GameNode.prototype.insertBefore = _insertBefore;
+  GameNode.prototype.insertAfter = _insertAfter;
+  GameNode.prototype.append = _append;
+
+  GameNode.prototype.remove = _removeNode;
+
+  GameNode.prototype.setInnerHtml = _setInnerHtml;
+  GameNode.prototype.setInnerText = _setInnerText;
+
+  GameNode.prototype.focus = _focus;
+  GameNode.prototype.blur = _blur;
+  GameNode.prototype.attr = _attr;
+  GameNode.prototype.style = _style;
+  GameNode.prototype.removeStyle = _removeStyle;
+
+  GameNode.prototype.getBoundingClientRect = _getBoundingClientRect;
 })(document, window);

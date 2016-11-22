@@ -438,11 +438,10 @@
     $('.play-controller').trigger('click').attr('disabled', true);
     isGameOver = true;
 
-    setTimeout(function() { _displayWinner(definition); }, 1000);
+    _displayWinner(definition);
   }
 
   function _displayWinner(definition) {
-    $('.game-main-container').addClass('hide');
     var $winner = $('.game-winner').removeClass('hide');
     $winner.find('.game-winner-name').setInnerText(definition.player.name);
   }

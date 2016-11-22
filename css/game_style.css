@@ -201,6 +201,15 @@ label>.form-control {
   margin-top: 4px;
 }
 
+.game-winner {
+  margin: 0 -10px 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.game-winner>h1 {
+  margin-top: 0;
+}
+
 @media (max-width: 375px) {
   .developed-by>.developers-name {
     display: block;

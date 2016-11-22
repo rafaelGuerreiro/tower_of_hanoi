@@ -73,7 +73,7 @@
     var shortcuts = [];
 
     $container.find('.shortcut').each(function() {
-      this.removeClass(errorClass);
+      this.closest('label').removeClass(errorClass);
       if (this.closest('.shortcut-definition-container').hasClass('hide'))
         return;
 
@@ -88,9 +88,11 @@
         if (ix === index)
           continue;
 
-        if (this.shortcut === array[index].shortcut) {
-          this.element.addClass(errorClass);
-          array[index].element.addClass(errorClass);
+        var target = array[ix];
+
+        if (this.shortcut === target.shortcut) {
+          this.element.closest('label').addClass(errorClass);
+          target.element.closest('label').addClass(errorClass);
         }
       }
     });
@@ -237,7 +239,7 @@
     var valid = true;
 
     $container.find('.player-setup input, .player-setup select').each(function() {
-      return valid = valid && $.isPresent(this.val());
+      return valid = valid && $.isPresent(this.val()) && !this.closest('label').hasClass('has-error');
     });
 
     return valid;

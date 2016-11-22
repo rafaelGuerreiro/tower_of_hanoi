@@ -526,8 +526,6 @@
     if (nodes instanceof GameNodes)
       return nodes.flatten();
 
-    // TODO make node
-
     if (!Array.isArray(nodes))
       nodes = [nodes];
 

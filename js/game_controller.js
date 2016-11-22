@@ -19,9 +19,6 @@
 
   var $container = $('.game-container');
 
-  // TODO validate shortcuts
-  // TODO display winner
-
   (function init() {
     _initializeVariables();
 
@@ -46,7 +43,7 @@
     $.computer.quit();
 
     _initializeVariables();
-    $('.game-main-container').addClass('hide');
+    $('.game-main-container, .game-winner').addClass('hide');
     $container.setInnerHtml('');
 
     $('.game-setup').removeClass('hide');
@@ -439,7 +436,14 @@
       return;
 
     $('.play-controller').trigger('click').attr('disabled', true);
-    console.log(definition.player.name + " won!");
     isGameOver = true;
+
+    _displayWinner(definition);
+  }
+
+  function _displayWinner(definition) {
+    $('.game-main-container').addClass('hide');
+    var $winner = $('.game-winner').removeClass('hide');
+    $winner.find('.game-winner-name').setInnerText(definition.player.name);
   }
 })($, document, window);

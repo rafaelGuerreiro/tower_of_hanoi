@@ -438,7 +438,7 @@
     $('.play-controller').trigger('click').attr('disabled', true);
     isGameOver = true;
 
-    _displayWinner(definition);
+    setTimeout(function() { _displayWinner(definition); }, 1000);
   }
 
   function _displayWinner(definition) {

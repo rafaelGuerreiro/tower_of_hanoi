@@ -93,7 +93,8 @@
         if (this.shortcut === target.shortcut) {
           this.element.closest('label').addClass(errorClass);
           target.element.closest('label').addClass(errorClass);
-        }
+        } else if ($.isEmpty(this.shortcut))
+          this.element.closest('label').addClass(errorClass);
       }
     });
   }
@@ -239,7 +240,8 @@
     var valid = true;
 
     $container.find('.player-setup input, .player-setup select').each(function() {
-      return valid = valid && $.isPresent(this.val()) && !this.closest('label').hasClass('has-error');
+      var $label = this.closest('label').toggleClass('has-error', $.isEmpty(this.val()));
+      return valid = valid && !$label.hasClass('has-error');
     });
 
     return valid;

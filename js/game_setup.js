@@ -26,7 +26,7 @@
     $container.live('change', '.player-setup input, .player-setup select', _toggleInitGame);
     $container.live('keyup', '.player-setup input', _toggleInitGameOrInitGame);
 
-    $container.live('change', '.shortcut', _validateShortcuts);
+    $container.live('change keyup', '.shortcut', _validateShortcuts);
 
     $body.live('click', '.init-game', _initGame);
   })();
@@ -240,7 +240,11 @@
     var valid = true;
 
     $container.find('.player-setup input, .player-setup select').each(function() {
-      var $label = this.closest('label').toggleClass('has-error', $.isEmpty(this.val()));
+      var $label = this.closest('label');
+
+      if (!this.matches('.shortcut'))
+        $label.toggleClass('has-error', $.isEmpty(this.val()));
+
       return valid = valid && !$label.hasClass('has-error');
     });
 
